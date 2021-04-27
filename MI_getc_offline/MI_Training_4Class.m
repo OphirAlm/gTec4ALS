@@ -44,9 +44,9 @@ downArrow = imread('downArrow.jpg');            % (4) load down arrow image
 nbchan = 16;                                    % number of channels
 % % % numTrials =50;                                 % set number of training trials PER CONDITION %%%
 % % % trialLength = 3;                                % each trial length in seconds
-cueLength = 0.5;
-readyLength = 0.5;                              %%% Added cue ready and next lengths %%%
-nextLength = 0.5;
+cueLength = 2;
+readyLength = 1;                              %%% Added cue ready and next lengths %%%
+nextLength = 1;
 % % % numClass = length(Classes);                                   % number of classes to train (two hands, leg & permutations + idle)
 % % % BuffSz = 0.5; % Buffer size in seconds
 

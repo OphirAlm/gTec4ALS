@@ -33,4 +33,4 @@ disp('Finished extracting features and labels.');
 MI5_LearnModel_SingleRec(recordingFolder);
 
 %% Train a model using all subject's recording
-MI_LearnModel_AllRec(recordingFolder);
+% MI_LearnModel_AllRec(recordingFolder);

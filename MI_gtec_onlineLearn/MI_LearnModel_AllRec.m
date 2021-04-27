@@ -24,12 +24,12 @@ for dir_i = 1 : N_folders
     curFolder = [mainPath, '\', folders(dir_i).name];
     %Load files
     TEMP_trials2remove = load(strcat(curFolder, '\trials2remove.mat'));
-    TEMP_correctLabeled = load(strcat(curFolder, '\correctLabeled.mat'));
+%     TEMP_correctLabeled = load(strcat(curFolder, '\correctLabeled.mat'));
     TEMP_MIFeatures = load(strcat(curFolder, '\MIFeatures.mat'));
     TEMP_targetlabels = load(strcat(curFolder, '\trainingVec.mat'));
     %Stack files
     trials2remove = [trials2remove, TEMP_trials2remove.trials2remove];
-    correctLabeled = [correctLabeled, TEMP_correctLabeled.correctLabeled];
+%     correctLabeled = [correctLabeled, TEMP_correctLabeled.correctLabeled];
     MIFeatures = [MIFeatures; TEMP_MIFeatures.MIFeatures];
     targetLabels = [targetLabels, TEMP_targetlabels.trainingVec];
 end
