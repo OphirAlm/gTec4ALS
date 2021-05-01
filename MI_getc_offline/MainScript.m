@@ -1,7 +1,7 @@
 
 clc; clear; close all;
 % subID = 2;
-% recordingFolder = ['C:/Subjects/Sub' n um2str(subID) '/'];
+% recordingFolder = ['C:\Subjects\Sub999' '/'];
 % recordingFolder = ['C:\Subjects\Sub999\18-Mar-2021 15-28\'];
 
 %% Band 
