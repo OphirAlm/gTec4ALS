@@ -1,3 +1,6 @@
 *.exe
 *.msi
 *.lnk
+*.autosave
+*.cfg
+*.asv
