@@ -23,7 +23,7 @@ datasetTable = [MIFeatures, targetLabels'];
 disp(['Mean validation accuracy - ' num2str(validationAccuracy * 100) '%'])
 
 %Saving the model
-save(strcat(recordingFolder,'\correct_RF_model.mat'), 'correctmodel')
+save(strcat(recordingFolder,'\accumilating_RF_model.mat'), 'accumilateModel')
 
 
 

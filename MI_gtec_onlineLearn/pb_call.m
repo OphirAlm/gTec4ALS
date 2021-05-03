@@ -14,6 +14,7 @@ ChunkSz       = num2str(ChunkSzCalc);       % Get Buffer size (in sec) times sam
 ResSzCalc     = Hz*str2double(S.RSlength.String);
 ResDelaySz    = num2str(ResSzCalc);            % Get resting state Buffer size (in sec) times sampling rate
 
+
 % TODO: find the FUCKING name of the sampling rate parameter
 % set_param(AMPobj,'',Hz);                % Set sampling rate 
 set_param(ChunkDelayobj,'siz',ChunkSz);           % Set Buffer size

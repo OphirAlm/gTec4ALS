@@ -1,4 +1,4 @@
-function [Hz, BufSz, nClass, subID, f, numTrials, RS_len] = extract_parameters(S)
+function [Hz, BufSz, nClass, subID, f, numTrials, RS_len, accumilationFlag] = extract_parameters(S)
 
 posHz       = S.Hz.Value;                       % Get sampling rate value
 Hz          = str2double(S.Hz.String(posHz,:));
@@ -13,4 +13,6 @@ f           = str2double(S.rng(1).String):0.1:str2double(S.rng(2).String); % Get
 numTrials   = str2double(S.nTrial.String);      % Get number of trials
 
 RS_len      = str2double(S.RSlength.String);    % Get resting state record length
+
+accumilationFlag = S.accumbx.Value;
 end
