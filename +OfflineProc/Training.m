@@ -1,6 +1,6 @@
 %% MI Training Scaffolding
 
-function [recordingFolder,subID] = MI_Training_4Class(bands)
+function [recordingFolder,subID] = Training(bands)
 %% Set params and setup psychtoolbox & Simulink
 % define objects' strings for Simulink objects
 USBobj          = 'USBamp_offline';
@@ -20,7 +20,7 @@ set_param(USBobj,'BlockReduction', 'off')
     parameter_gui(ChunkDelayobj, AMPobj, IMPobj, RestDelayobj);
 
 %Start simulation
-getSig_offline(inf);
+Utillity.getSig_offline(inf);
 
 %Get the running time object (buffer)
 rto = get_param(ChunkDelayobj,'RuntimeObject');
@@ -63,7 +63,7 @@ disp('Setting up Psychtoolbox parameters...');
 disp('This will open a black screen - good luck!');
 PsychDebugWindowConfiguration(0,1);   %%% For debugging, change 1 to 0.5 (opaquaness of the screen) %%%
 Screen('Preference', 'SkipSyncTests', 0);   %%% Change to 1 if in debugging mode %%%
-[window,white,black,screenXpixels,screenYpixels,xCenter,yCenter,ifi] = PsychInit();
+[window,white,black,screenXpixels,screenYpixels,xCenter,yCenter,ifi] = Utillity.PsychInit();
 topPriorityLevel = MaxPriority(window);
 Priority(topPriorityLevel);
 
@@ -75,25 +75,18 @@ Screen('Flip', window);
 pause(10) % Letting the signal to get stable
 pause(restingTime)
 RestingSignal =  restingStateDelay.OutputPort(1).Data';
-%     for t = 1 : floor(restingTime / 5)
-%         pause(5);
-%         RestingSignal(:, 1 + (t-1) * Hz * 5 : Hz * 5 + ((t - 1) * Hz * 5)) = ...
-%             restingStateBuffer.OutputPort(1).Data';
-%     end
 % Cut and clean the signalas needed
 [RestingSignal, ~] = MI_Preprocess(RestingSignal);
+
 % Show a message the declares that training is about to begin
 DrawFormattedText(window, strcat('The training will begin in few seconds.'), 'center','center', white);
 Screen('Flip', window);
 pause(3)
 %% Record Training Stage
 % prepare set of training trials with predefined arrow cues
-trainingVec = prepareTraining(numTrials,Classes);  %% Changed the function to be equal trials per condition %%%
+trainingVec = Utillity.prepareTraining(numTrials,Classes);  %% Changed the function to be equal trials per condition %%%
 save(strcat(recordingFolder,'trainingVec.mat'),'trainingVec');
-labelVec = trainingVec;
 pause(0.2);
-%GetSig %TODO need to add a stop mechanism
-%t0 = GetSecs
 
 % for each trial:
 for trial_i = 1:numTrials * numClass %%% Trials times number of classes %%%
@@ -139,12 +132,6 @@ for trial_i = 1:numTrials * numClass %%% Trials times number of classes %%%
     Screen('Flip', window);
     pause(trialLength)
     EEG(:, :, trial_i) = rto.OutputPort(1).Data';
-    %In the offline proccess, we will  use loop and take buffers.
-    %     for t = 1 : trialLength * 2
-    %         pause(BuffSz);
-    %         EEG(:, 1 + (t-1) * Hz * BuffSz : Hz * BuffSz + ((t - 1) * Hz * BuffSz), trial) = ...
-    %             rto.OutputPort(1).Data';
-    %     end
     
     Screen('TextSize', window, 70);  % Draw text in the bottom portion of the screen in white
     DrawFormattedText(window, 'Next', 'center',screenYpixels * 0.75, white);
@@ -162,6 +149,8 @@ save([recordingFolder, 'RestingSignal'], 'RestingSignal')
 save([recordingFolder, 'parameters'], 'Hz', 'trialLength')
 save(strcat(recordingFolder,'FeatureParam'),'bands');
 disp('finish :)');
-%Stop simulink
-set_param(gcs, 'SimulationCommand', 'stop')
 
+% Stop simulink
+set_param(gcs, 'SimulationCommand', 'stop')
+% Close PsychToolBox
+Screen('close')

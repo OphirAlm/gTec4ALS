@@ -19,7 +19,7 @@ set_param(USBobj,'BlockReduction', 'off')
     = parameter_gui(ChunkDelayobj, AMPobj, IMPobj, RestDelayobj);
 
 % Start simulation
-getSig_online(inf);
+Utillity.getSig_online(inf);
 
 % Get the running time object (Delay line)
 restingStateDelay  = get_param(RestDelayobj,'RuntimeObject');
@@ -46,7 +46,7 @@ PsychDebugWindowConfiguration(0,1);
 Screen('Preference', 'SkipSyncTests', 0);
 
 % Initialize Psychtoolbox
-[window,white,black,screenXpixels,screenYpixels,xCenter,yCenter,ifi] = PsychInit();
+[window,white,black,screenXpixels,screenYpixels,xCenter,yCenter,ifi] = Utillity.PsychInit();
 topPriorityLevel = MaxPriority(window);
 Priority(topPriorityLevel);
 
@@ -73,18 +73,22 @@ assert(nClass == length(model.ClassNames), ...
     'number of chosen classes and number of model classes are uneven!');
 
 %% Record Resteing State Stage
-DrawFormattedText(window, strcat(['Just rest for now. \n' 'The Communication Program will begin soon.']), 'center','center', white);
+DrawFormattedText(window, strcat(...
+    ['Just rest for now. \n' 'The Communication Program will begin soon.']),...
+    'center','center', white);
 Screen('Flip', window);     % Adjust screen
 pause(10)                   % Letting the signal time to stabalize
 pause(restingTime)          % Pause for the resting state time
 
 % Extract resting state signal and preprocess it
 RestingSignal       = restingStateDelay.OutputPort(1).Data';
-[RestingMI, ~]      = MI_Preprocess(RestingSignal);
-restingStateBands   = restingState(RestingMI, bands, Hz);
+[RestingMI, ~]      = OnlineProc.Preprocess(RestingSignal);
+restingStateBands   = EEGFun.restingState(RestingMI, bands, Hz);
 
 % Show a message that declares that training is about to begin
-DrawFormattedText(window, strcat('The Communication Progaram will begin in few seconds.'), 'center','center', white);
+DrawFormattedText(window, strcat(...
+    'The Communication Progaram will begin in few seconds.'),...
+    'center','center', white);
 Screen('Flip', window);     % Adjust screen
 pause(3)
 
@@ -111,10 +115,10 @@ while runFlag == 1 % Number of trials times number of classes
     EEG = rto.OutputPort(1).Data';
     
     % Clean signal
-    [MIData, removeTrial] = MI_Preprocess(EEG);
+    [MIData, removeTrial] = OnlineProc.Preprocess(EEG);
     
     % Extract features
-    MIFeatures = ExtractFeatures_Online(MIData, Hz, bands, f, restingStateBands);
+    MIFeatures = OnlineProc.ExtractFeatures(MIData, Hz, bands, f, restingStateBands);
     
     % Predict using the pre-trained model
     prediction = model.predict(MIFeatures);
@@ -125,8 +129,7 @@ while runFlag == 1 % Number of trials times number of classes
     end
     
     %Write the result to a txt file
-    pred_str = num2str(prediction);t
-    disp(pred_str)
+    pred_str = num2str(prediction);
     txtFile = fopen('Action.txt', 'w');
     fprintf(txtFile, pred_str);
     fclose(txtFile);

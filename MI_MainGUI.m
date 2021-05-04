@@ -5,13 +5,15 @@
  
 %% Choose file to run according to decision
 if online _ Learn
-    cd([pwd, '\MI_gtec_onlineLearn'])
+    addpath([pwd, '\MI_gtec_onlineLearn'])
     MI_Online_Training
+    rmpath([pwd, '\MI_gtec_onlineLearn'])
 elseif offline_Learn
-    cd([pwd, '\MI_gtec_offline'])
+    addpath([pwd, '\MI_gtec_offline'])
     MainScript
+    rmpath([pwd, '\MI_gtec_offline'])
 elseif Online _ Communicate
-    cd([pwd, '\MI_gtec_onlineCommunicate'])
+    addpath([pwd, '\MI_gtec_onlineCommunicate'])
     MI_Online_Communicate
+    rmpath([pwd, '\MI_gtec_onlineCommunicate'])
 end
-cd('..')

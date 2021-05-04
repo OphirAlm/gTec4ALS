@@ -18,20 +18,20 @@ bands{8} = [30, 40];
 
 
 %% Run stimulation and record EEG data
-[recordingFolder,subID] = MI_Training_4Class(bands);
+[recordingFolder,subID] = OfflineProc.Training(bands);
 disp('Finished stimulation and EEG recording. Stop the LabRecorder and press any key to continue...');
 
 %% Run pre-processing pipeline on recorded data
-MI2_Preprocess_Scaffolding(recordingFolder);
+OfflineProc.Preprocess(recordingFolder);
 disp('Finished pre-processing pipeline.');
 
 
 %% Extract features and labels
-MI4_ExtractFeatures_Scaffolding(recordingFolder);
+OfflineProc.ExtractFeatures(recordingFolder);
 disp('Finished extracting features and labels.');
 
 %% Train a model using single recording
-MI5_LearnModel_SingleRec(recordingFolder);
+OfflineProc.LearnModel(recordingFolder);
 
 %% Train a model using all subject's recording
 % MI_LearnModel_AllRec(recordingFolder);

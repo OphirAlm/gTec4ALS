@@ -1,5 +1,5 @@
 function [model, validationAccuracy]...
-    = MI_LearnModel_OnlineBoost_CorrectOnly(MIFeatures, targetLabels, trials2remove, recordingFolder)
+    = LearnModel(MIFeatures, targetLabels, trials2remove, recordingFolder)
 
 
 %% Read Features & Labels
@@ -14,7 +14,7 @@ labels(trials2remove) = [];
 % Test with boosting
 datasetTable = [MIFeatures, targetLabels'];
 [model, validationAccuracy] =...
-    trainBoostClassifier(datasetTable, 10, 300);
+    ModelFun.trainBaggingClassifier(datasetTable, k, 300);
 
 
 
@@ -23,7 +23,7 @@ datasetTable = [MIFeatures, targetLabels'];
 disp(['Mean validation accuracy - ' num2str(validationAccuracy * 100) '%'])
 
 %Saving the model
-save(strcat(recordingFolder,'\accumilating_RF_model.mat'), 'accumilateModel')
+save(strcat(recordingFolder,'\RF_model.mat'), 'model')
 
 
 

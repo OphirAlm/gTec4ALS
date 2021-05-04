@@ -1,13 +1,8 @@
-function [MIFeatures] = ExtractFeatures_Online(MIData, Hz,bands, f, restingStateBands)
+function [MIFeatures] = ExtractFeatures(MIData, Hz,bands, f, restingStateBands)
 %% This function extracts features for the machine learning process.
-
 
 % get number of channels from main data variable
 numChans = size(MIData,1);
-
-%% PLEASE ENTER RELEVENT FREAQUENCIES - NO NEED in the online proccess
-
-
 
 % how many bands overall exist
 bands_N = length(bands);
@@ -59,14 +54,14 @@ for channel = 1:numChans
     power = pwelch(squeeze(MIData(channel,:)), round(0.75 * Hz), round(0.7 * Hz) ,f ,Hz);
     
     %Probability function
-    prob_f = Probably(power)';
+    prob_f = EEGFun.Probably(power)';
     
     %Spectral moment feature
     MIFeaturesLabel(channel, n) = f * prob_f ;
     n = n + 1;
     
     %Spectral edge
-    MIFeaturesLabel(channel, n) = precen(prob_f' , 0.9, f);
+    MIFeaturesLabel(channel, n) = EEGFun.precen(prob_f' , 0.9, f);
     n = n + 1;
     
     %Spectral entropy

@@ -19,7 +19,7 @@ set_param(USBobj,'BlockReduction', 'off')
     = parameter_gui(ChunkDelayobj, AMPobj, IMPobj, RestDelayobj);
 
 % Start simulation
-getSig_online(inf);
+Utillity.getSig_online(inf);
 
 % Get the running time object (Delay line)
 restingStateDelay  = get_param(RestDelayobj,'RuntimeObject');
@@ -46,7 +46,7 @@ PsychDebugWindowConfiguration(0,1);
 Screen('Preference', 'SkipSyncTests', 0);
 
 % Initialize Psychtoolbox
-[window,white,black,screenXpixels,screenYpixels,xCenter,yCenter,ifi] = PsychInit();
+[window,white,black,screenXpixels,screenYpixels,xCenter,yCenter,ifi] = Utillity.PsychInit();
 topPriorityLevel = MaxPriority(window);
 Priority(topPriorityLevel);
 
@@ -57,12 +57,12 @@ Priority(topPriorityLevel);
 Classes = 1 : nClass;
 
 % Load photos
-[Arrow, Idle, Mark] = load_photos();
+[Arrow, Idle, Mark] = Utillity.load_photos();
 
 %% Make Textures and psychtoolbox Display Setting
 
 % Make textures
-[ArrowTexture, IdleTexture, MarkTexture] = Texture(window, Arrow, Idle, Mark);
+[ArrowTexture, IdleTexture, MarkTexture] = Utillity.Texture(window, Arrow, Idle, Mark);
 
 % Gap between the targets & the width of the marker line
 gap = 20;
@@ -132,8 +132,8 @@ pause(restingTime)          % Pause for the resting state time
 
 % Extract resting state signal and preprocess it
 RestingSignal       = restingStateDelay.OutputPort(1).Data';
-[RestingMI, ~]      = MI_Preprocess(RestingSignal);
-restingStateBands   = restingState(RestingMI, bands, Hz);
+[RestingMI, ~]      = OnlineProc.Preprocess(RestingSignal);
+restingStateBands   = EEGFun.restingState(RestingMI, bands, Hz);
 
 % Show a message that declares that training is about to begin
 DrawFormattedText(window, strcat('The training will begin in few seconds.'), 'center','center', white);
@@ -143,7 +143,7 @@ pause(3)
 
 % Prepare set of training trials with predefined arrow cues
 %%% Changed the function to be equal trials per condition %%%
-trainingVec = prepareTraining(numTrials,Classes);
+trainingVec = Utillity.prepareTraining(numTrials,Classes);
 
 % Allocate arraies
 EEG             = zeros(size(RestingSignal, 1), trialLength * Hz, numTrials * nClass * 3);
@@ -208,11 +208,11 @@ for trial = 1 : numTrials * nClass % Number of trials times number of classes
         labels(chunk_i) = currentTrial;
         
         % Clean signal
-        [MIData, removeTrial] = MI_Preprocess(EEG(:, :, chunk_i));
+        [MIData, removeTrial] = OnlineProc.Preprocess(EEG(:, :, chunk_i));
         trials2remove(chunk_i) = removeTrial; %Flag is trial is noisy
         
         % Extract features
-        MIFeatures(chunk_i, :) = ExtractFeatures_Online(MIData, Hz, bands, f, restingStateBands);
+        MIFeatures(chunk_i, :) = OnlineProc.ExtractFeatures(MIData, Hz, bands, f, restingStateBands);
         
         % Predict using the pre-trained model
         prediction = model.predict(MIFeatures(chunk_i, :));
@@ -323,10 +323,10 @@ save([recordingFolder, 'accumilateLabels'], 'accumilateLabels')
 if ~accumilationFlag
     %Train new model
     [trainedClassifier, validationAccuracy]...
-        = MI_LearnModel_OnlineBoost(MIFeatures, labels, trials2remove, recordingFolder);
+        = OnlineProc.LearnModel(MIFeatures, labels, trials2remove, recordingFolder);
 else
     [trainedClassifier, validationAccuracy]...
-        = MI_LearnModel_OnlineBoost(MIAccumilate, accumilateLabels, removeAccumilate, recordingFolder);
+        = OnlineProc.LearnModel(MIAccumilate, accumilateLabels, removeAccumilate, recordingFolder);
 end
 
 %Rename folder with new model accuracy

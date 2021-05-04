@@ -1,4 +1,4 @@
-function [firstDay,mode] = MI4_ExtractFeatures_Scaffolding(recordingFolder)
+function ExtractFeatures(recordingFolder)
 %% This function extracts features for the machine learning process.
 
 %% Load previous variables:
@@ -11,10 +11,10 @@ load(strcat(recordingFolder,'restingSignal.mat'));                      % load t
 
 
 %% set varibles
-trials = size(MIData,3);                                            % get number of trials from main data variable
+trials = size(MIData, 3);                                            % get number of trials from main data variable
 
 %% for using only specific channels
-numChans = size(MIData,1);                                    % get number of channels from main data variable
+numChans = size(MIData, 1);                                    % get number of channels from main data variable
 f = 8 : 0.1 :30;
 %% PLEASE ENTER RELEVENT FREAQUENCIES
 
@@ -23,7 +23,7 @@ numFeatures = length(bands);                                             % how m
 MIFeaturesLabel = NaN(trials,numChans,numFeatures);                      % init features+labels matrix
 
 %% Extract Resting State Power Bands
-restingStateBands = restingState(RestingSignal, bands, Hz);
+restingStateBands = EEGFun.restingState(RestingSignal, bands, Hz);
 %% Extract features (powerbands in alpha, beta, delta, theta, gamma bands)
 for channel = 1:numChans
     n = 1;
@@ -68,14 +68,14 @@ for channel = 1:numChans
     power = pwelch(squeeze(MIData(channel,:,:)), round(0.75 * Hz), round(0.7 * Hz) ,f ,Hz);
     
     %Probability function
-    prob_f = Probably(power);
+    prob_f = EEGFun.Probably(power);
     
     %Spectral moment feature
     MIFeaturesLabel(:, channel, n) = f * prob_f ;
     n = n + 1;
     
     %Spectral edge
-    MIFeaturesLabel(:, channel, n) = precen(prob_f' , 0.9, f);
+    MIFeaturesLabel(:, channel, n) = EEGFun.precen(prob_f' , 0.9, f);
     n = n + 1;
     
     %Spectral entropy

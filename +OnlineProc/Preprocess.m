@@ -1,5 +1,5 @@
 %% Offline Preprocessing
-function [MIData, removeTrial] = MI_Preprocess(raw_EEG)
+function [MIData, removeTrial] = Preprocess(raw_EEG)
 %% Some parameters (this needs to change according to your system):
 
 % update channel names - each group should update this according to
@@ -26,9 +26,9 @@ numChans = size(EEG_chans,1);
 
 
 %% Laplace
- % INSERT the chosen electrode (C03, C04, Cz must be first and in that
- % order)
-motorIndex = {'C03','C04','Czz', 'Fzz', 'FCz', 'FC4', 'FC3'};     
+% INSERT the chosen electrode (C03, C04, Cz must be first and in that
+% order)
+motorIndex = {'C03','C04','Czz', 'Fzz', 'FCz', 'FC4', 'FC3'};
 EEG_chans_cell = cellstr(EEG_chans);
 elecIndex = zeros(numChans, 1);
 for i = 1 : length(motorIndex)

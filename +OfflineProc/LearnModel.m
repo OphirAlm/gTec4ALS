@@ -1,5 +1,4 @@
-function [train_accuracy_m , train_accuracy_sd , val_accuracy_m ,val_accuracy_sd]...
-    = MI5_LearnModel_SingleRec(recordingFolder)
+function LearnModel(recordingFolder)
 
 
 %% Read Features & Labels
@@ -43,7 +42,7 @@ targetLabels(trials2remove) = [];
 % Test with boosting
 datasetTable = [MIFeatures, targetLabels'];
 [model, validationAccuracy] =...
-    trainBaggingClassifier(datasetTable, k, 300);
+    ModelFun.trainBaggingClassifier(datasetTable, k, 300);
 
 
 %% Test data
