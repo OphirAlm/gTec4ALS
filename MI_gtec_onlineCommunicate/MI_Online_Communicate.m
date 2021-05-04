@@ -15,8 +15,8 @@ open_system(USBobj)
 set_param(USBobj,'BlockReduction', 'off')
 
 % Activate parameter gui
-[Hz, trialLength, nClass, subID, f, numTrials, restingTime, accumilationFlag] ...
-    = parameter_gui(ChunkDelayobj, AMPobj, IMPobj, RestDelayobj);
+[Hz, trialLength, nClass, subID, ~, restingTime] ...
+    = Utillity.parameter_gui(ChunkDelayobj, AMPobj, IMPobj, RestDelayobj, 'Communication');
 
 % Start simulation
 Utillity.getSig_online(inf);

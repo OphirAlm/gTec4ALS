@@ -8,16 +8,16 @@ USBobj          = 'USBamp_offline';
 % RestBUFFobj     = 'USBamp_offline/Resting State Buffer';
 AMPobj          = 'USBamp_offline/g.USBamp UB-2016.03.01';
 IMPobj          = 'USBamp_offline/Impedance Check';
-RestDelayobj          = 'USBamp_offline/Resting Delay';
-ChunkDelayobj          = 'USBamp_offline/Chunk Delay';
+RestDelayobj    = 'USBamp_offline/Resting Delay';
+ChunkDelayobj   = 'USBamp_offline/Chunk Delay';
 
 % open Simulink
 open_system(USBobj)
 set_param(USBobj,'BlockReduction', 'off')
 
 % create parameter gui
-[Hz, trialLength, numClass, subID, ~, numTrials, restingTime] = ...
-    parameter_gui(ChunkDelayobj, AMPobj, IMPobj, RestDelayobj);
+[Hz, trialLength, numClass, subID, numTrials, restingTime] ...
+    = Utillity.parameter_gui(ChunkDelayobj, AMPobj, IMPobj, RestDelayobj, 'Offline');
 
 %Start simulation
 Utillity.getSig_offline(inf);
