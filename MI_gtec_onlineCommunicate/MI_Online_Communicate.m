@@ -17,7 +17,6 @@ set_param(USBobj,'BlockReduction', 'off')
 % Activate parameter gui
 [Hz, trialLength, nClass, subID, f, numTrials, restingTime, accumilationFlag] ...
     = parameter_gui(ChunkDelayobj, AMPobj, IMPobj, RestDelayobj);
-% accumilationFlag = 1;
 
 % Start simulation
 getSig_online(inf);
@@ -93,7 +92,7 @@ pause(3)
 ShowCursor;
 sca;
 Priority(0);
-screen('close')
+Screen('close')
 %% Record Training Stage
 
 runFlag = 1;
@@ -108,30 +107,29 @@ while runFlag == 1 % Number of trials times number of classes
         return
     end
     
+    % Get signal chunk
+    EEG = rto.OutputPort(1).Data';
     
-        
-        % Get signal chunk
-        EEG = rto.OutputPort(1).Data';
-        
-        % Clean signal
-        [MIData, removeTrial] = MI_Preprocess(EEG);
-        
-        % Extract features
-        MIFeatures = ExtractFeatures_Online(MIData, Hz, bands, f, restingStateBands);
-        
-        % Predict using the pre-trained model
-        prediction = model.predict(MIFeatures);
-        
-        % If the trial was noisy, classify as idle
-        if removeTrial == 1
-            prediction = 1;
-        end
-        
-        %Write the result to a txt file
-        pred_str = num2str(prediction);
-        txtFile = fopen('Action.txt', 'w');
-        fprintf(txtFile, pred_str);
-        fclose(txtFile);
+    % Clean signal
+    [MIData, removeTrial] = MI_Preprocess(EEG);
+    
+    % Extract features
+    MIFeatures = ExtractFeatures_Online(MIData, Hz, bands, f, restingStateBands);
+    
+    % Predict using the pre-trained model
+    prediction = model.predict(MIFeatures);
+    
+    % If the trial was noisy, classify as idle
+    if removeTrial == 1
+        prediction = 1;
+    end
+    
+    %Write the result to a txt file
+    pred_str = num2str(prediction);t
+    disp(pred_str)
+    txtFile = fopen('Action.txt', 'w');
+    fprintf(txtFile, pred_str);
+    fclose(txtFile);
 end
 
 %Stop simulink

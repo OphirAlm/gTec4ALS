@@ -74,7 +74,7 @@ for channel = 1:numChans
 end
 
 % Reshape into 2-D matrix
-MIFeatures = reshape(MIFeaturesLabel,1 ,numChans * (bands_N * 7 + 4) );
+MIFeatures = reshape(MIFeaturesLabel,1 ,numChans * (bands_N * 8 + 4) );
 
 
 

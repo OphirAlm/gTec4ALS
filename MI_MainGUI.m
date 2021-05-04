@@ -6,11 +6,12 @@
 %% Choose file to run according to decision
 if online _ Learn
     cd([pwd, '\MI_gtec_onlineLearn'])
-    MI_Online _ Training
+    MI_Online_Training
 elseif offline_Learn
     cd([pwd, '\MI_gtec_offline'])
     MainScript
 elseif Online _ Communicate
     cd([pwd, '\MI_gtec_onlineCommunicate'])
-    MI_Online _ Communicate
+    MI_Online_Communicate
 end
+cd('..')

@@ -17,7 +17,6 @@ set_param(USBobj,'BlockReduction', 'off')
 % Activate parameter gui
 [Hz, trialLength, nClass, subID, f, numTrials, restingTime, accumilationFlag] ...
     = parameter_gui(ChunkDelayobj, AMPobj, IMPobj, RestDelayobj);
-% accumilationFlag = 1;
 
 % Start simulation
 getSig_online(inf);
@@ -188,7 +187,7 @@ for trial = 1 : numTrials * nClass % Number of trials times number of classes
     
     %% Present the cue untill 3 succesfull classifications
     
-    success = ones(1, nClass);  %initiallize counter
+    success = ones(1, 4);  %initiallize counter
     
     while max(success) < 4
         

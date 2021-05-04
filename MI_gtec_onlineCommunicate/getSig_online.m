@@ -24,7 +24,7 @@ set_param(modelName,'SimulationMode','normal');
 set_param(modelName,'SimulationCommand','start');
 set_param(modelName,'StopTime', num2str(session_runtime)); 
 
-eventHandle = add_exec_event_listener(Scope.blockName,Scope.blockEvent, Scope.blockFcn);
+eventHandle = add_exec_event_listener(Scope.blockName, Scope.blockEvent, Scope.blockFcn);
 
 % rawSignal = zeros(16,1);
 % curSignal = Scope.blockFcn;
