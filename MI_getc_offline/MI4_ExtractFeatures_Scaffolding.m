@@ -33,6 +33,7 @@ for channel = 1:numChans
     beta_power = bandpower(squeeze(MIData(channel,:,:)),Hz,[12, 30]);
     theta_power = bandpower(squeeze(MIData(channel,:,:)),Hz,[4, 8]);
     mu_power = bandpower(squeeze(MIData(channel,:,:)),Hz,[9, 13]);
+    gamma_power = bandpower(squeeze(MIData(channel,:,:)),Hz,[30, 40]);
     
     %Band power features  
     for feature = 1:numFeatures
@@ -53,8 +54,10 @@ for channel = 1:numChans
             MIFeaturesLabel(:, channel, n) ./ theta_power';
         MIFeaturesLabel(:, channel, n + 6) = ...
             MIFeaturesLabel(:, channel, n) ./ mu_power';
+        MIFeaturesLabel(:, channel, n + 6) = ...
+            MIFeaturesLabel(:, channel, n) ./ gamma_power';
         
-        n = n + 7;
+        n = n + 8;
     end
     
     %sqrt total power feature

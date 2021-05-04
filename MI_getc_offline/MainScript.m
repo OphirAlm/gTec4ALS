@@ -14,6 +14,7 @@ bands{4} = [12,15];
 bands{5} = [15,18];
 bands{6} = [18,25];
 bands{7} = [25,30];
+bands{8} = [30, 40];
 
 
 %% Run stimulation and record EEG data
