@@ -11,16 +11,16 @@ load(strcat(recordingFolder,'restingSignal.mat'));                      % load t
 
 
 %% set varibles
-trials = size(MIData, 3);                                            % get number of trials from main data variable
-
-%% for using only specific channels
-numChans = size(MIData, 1);                                    % get number of channels from main data variable
-f = 8 : 0.1 :30;
-%% PLEASE ENTER RELEVENT FREAQUENCIES
-
-
-numFeatures = length(bands);                                             % how many features overall exist
-MIFeaturesLabel = NaN(trials,numChans,numFeatures);                      % init features+labels matrix
+% get number of trials from main data variable
+trials = size(MIData, 3);                                            
+% get number of channels from main data variable
+numChans = size(MIData, 1);                   
+% Choose frequencies range
+f = 4 : 0.1 :40;
+% how many bands overall exist
+numFeatures = length(bands);       
+% init features+labels matrix
+MIFeaturesLabel = NaN(trials,numChans,numFeatures);                      
 
 %% Extract Resting State Power Bands
 restingStateBands = EEGFun.restingState(RestingSignal, bands, Hz);

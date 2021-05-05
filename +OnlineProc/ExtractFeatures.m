@@ -1,4 +1,4 @@
-function [MIFeatures] = ExtractFeatures(MIData, Hz,bands, restingStateBands)
+function [MIFeatures] = ExtractFeatures(MIData, Hz, bands, restingStateBands)
 %% This function extracts features for the machine learning process.
 
 % Total frequency range
