@@ -1,12 +1,17 @@
-function MI_LearnModel_AllRec(recordingFolder)
-
+function LearnModel_AllRec()
+% Collect all the features from all the subfolders in the choosen
+% directory, and trains a model with all the recordings that waasa found.
+% The new model will be saved in a new subfolder in the choosen directory.
 
 %% Read Features & Labels
+
+recordingFolder = uigetdir('C:/Subjects/', ...
+    'Choose Desired Directory');
+
 %Initiallize
 trials2remove = [];
 MIFeatures = [];
 targetLabels = [];
-correctLabeled = [];
 
 %Subject's main folder
 folders = dir([recordingFolder]);
@@ -24,21 +29,20 @@ for dir_i = 1 : N_folders
     curFolder = [mainPath, '\', folders(dir_i).name];
     %Load files
     TEMP_trials2remove = load(strcat(curFolder, '\trials2remove.mat'));
-%     TEMP_correctLabeled = load(strcat(curFolder, '\correctLabeled.mat'));
     TEMP_MIFeatures = load(strcat(curFolder, '\MIFeatures.mat'));
     TEMP_targetlabels = load(strcat(curFolder, '\trainingVec.mat'));
     %Stack files
     trials2remove = [trials2remove, TEMP_trials2remove.trials2remove];
-%     correctLabeled = [correctLabeled, TEMP_correctLabeled.correctLabeled];
     MIFeatures = [MIFeatures; TEMP_MIFeatures.MIFeatures];
     targetLabels = [targetLabels, TEMP_targetlabels.trainingVec];
 end
 
 %% Read Features & Labels
 trials2remove = logical(trials2remove);
-% correctLabeled = logical(abs(correctLabeled - 1));
-% trials2remove = trials2remove & correctLabeled;
+
+
 k = 5;
+trees_N = 300;
 
 %Removing bad trials
 MIFeatures(trials2remove, :) = [];
@@ -48,7 +52,7 @@ targetLabels(trials2remove) = [];
 % Test with boosting
 datasetTable = [MIFeatures, targetLabels'];
 [model, validationAccuracy] =...
-    trainBoostClassifier(datasetTable, k, 300);
+    trainBoostClassifier(datasetTable, k, trees_N);
 
 %% Test data
 %Printing the results

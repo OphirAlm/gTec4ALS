@@ -1,5 +1,4 @@
-%% MI Training Scaffolding
-close all; clear; clc;
+%% Online Training Script
 
 %% Set params and setup psychtoolbox & Simulink
 
@@ -10,8 +9,8 @@ IMPobj          = 'USBamp_online/Impedance Check';
 RestDelayobj    = 'USBamp_online/Resting Delay';
 ChunkDelayobj   = 'USBamp_online/Chunk Delay';
 
-% Open Simulink
-open_system(USBobj)
+% open Simulink
+open_system(['Utillity/' USBobj])
 set_param(USBobj,'BlockReduction', 'off')
 
 % Activate parameter gui
@@ -60,7 +59,6 @@ Classes = 1 : nClass;
 [Arrow, Idle, Mark] = Utillity.load_photos();
 
 %% Make Textures and psychtoolbox Display Setting
-
 % Make textures
 [ArrowTexture, IdleTexture, MarkTexture] = Utillity.Texture(window, Arrow, Idle, Mark);
 
@@ -81,8 +79,6 @@ targetRect(3, :) = [leftRect(1:2) - targetLine, leftRect(3:4) + targetLine];
 targetRect(4, :) = [downRect(1:2) - targetLine, downRect(3:4) + targetLine];
 
 %% Parmeters
-% % % numTrials       = 8;     % set number of training trials PER CONDITION %%%
-% maxtrialLength  = 20;    % each trial length in seconds
 cueLength       = 2;     % Cue length in seconds
 readyLength     = 1.5;   % Ready length in seconds
 nextLength      = 2;     % Next length in seconds
@@ -94,7 +90,6 @@ KbName('UnifyKeyNames');
 escapeKey = KbName('Escape');                   % let psychtoolbox know what the escape key is
 
 %% Load model, params etc.
-
 % Load model
 load(strcat(fullPath,'\RF_model.mat'), 'model')
 
@@ -139,10 +134,9 @@ restingStateBands   = EEGFun.restingState(RestingMI, bands, Hz);
 DrawFormattedText(window, strcat('The training will begin in few seconds.'), 'center','center', white);
 Screen('Flip', window);     % Adjust screen
 pause(3)
-%% Record Training Stage
 
+%% Record Training Stage
 % Prepare set of training trials with predefined arrow cues
-%%% Changed the function to be equal trials per condition %%%
 trainingVec = Utillity.prepareTraining(numTrials,Classes);
 
 % Allocate arraies
@@ -186,7 +180,6 @@ for trial = 1 : numTrials * nClass % Number of trials times number of classes
     pause(readyLength);
     
     %% Present the cue untill 3 succesfull classifications
-    
     success = ones(1, 4);  %initiallize counter
     
     while max(success) < 4
@@ -229,7 +222,6 @@ for trial = 1 : numTrials * nClass % Number of trials times number of classes
     end
     
     %% Displaying final decision arrows
-    
     [~, location] = max(success);
     % If 3 the user got 3 correct predictions, the trial is marked as
     % correct.
@@ -258,7 +250,6 @@ for trial = 1 : numTrials * nClass % Number of trials times number of classes
 end
 
 %% Delete spare space in arraies
-
 EEG(:,:,chunk_i:end)           = [];
 labels(chunk_i:end)            = [];
 trials2remove(chunk_i:end)     = [];
@@ -268,6 +259,7 @@ correctLabeled(chunk_i:end)    = [];
 ShowCursor;
 sca;
 Priority(0);
+Screen('close')
 
 %Stop simulink
 set_param(gcs, 'SimulationCommand', 'stop')

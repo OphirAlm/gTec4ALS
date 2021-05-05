@@ -4,15 +4,13 @@ function [recordingFolder,subID] = Training(bands)
 %% Set params and setup psychtoolbox & Simulink
 % define objects' strings for Simulink objects
 USBobj          = 'USBamp_offline';
-% BUFFobj         = 'USBamp_offline/Buffer';
-% RestBUFFobj     = 'USBamp_offline/Resting State Buffer';
 AMPobj          = 'USBamp_offline/g.USBamp UB-2016.03.01';
 IMPobj          = 'USBamp_offline/Impedance Check';
 RestDelayobj    = 'USBamp_offline/Resting Delay';
 ChunkDelayobj   = 'USBamp_offline/Chunk Delay';
 
 % open Simulink
-open_system(USBobj)
+open_system(['Utillity/' USBobj])
 set_param(USBobj,'BlockReduction', 'off')
 
 % create parameter gui
@@ -35,27 +33,23 @@ date = strrep(date,':','-');
 Classes = 1 : numClass;
 recordingFolder = strcat('C:\Subjects\Sub',num2str(subID),'\offline- ',date,'\');   %%% Change the path if needed %%%
 mkdir(recordingFolder);
-idleSign = imread('idleSign.jpg');              % (1) load idle sign
-rightArrow = imread('RightArrow.jpg');          % (2) load right arrow image
-leftArrow = imread('LeftArrow.jpg');            % (3) load left arrow image
-downArrow = imread('downArrow.jpg');            % (4) load down arrow image
+idleSign = imread('./LoadingPics/idleSign.jpg');              % (1) load idle sign
+rightArrow = imread('./LoadingPics/RightArrow.jpg');          % (2) load right arrow image
+leftArrow = imread('./LoadingPics/LeftArrow.jpg');            % (3) load left arrow image
+downArrow = imread('./LoadingPics/downArrow.jpg');            % (4) load down arrow image
 
-% % % Hz = 512;                                       % sampling rate
 nbchan = 16;                                    % number of channels
-% % % numTrials =50;                                 % set number of training trials PER CONDITION %%%
-% % % trialLength = 3;                                % each trial length in seconds
 cueLength = 2;
 readyLength = 1;                              %%% Added cue ready and next lengths %%%
 nextLength = 1;
-% % % numClass = length(Classes);                                   % number of classes to train (two hands, leg & permutations + idle)
-% % % BuffSz = 0.5; % Buffer size in seconds
 
 EEG = zeros(nbchan, trialLength*Hz, numClass*numTrials);
 
 
 % Define the keyboard keys that are listened for:
 KbName('UnifyKeyNames');
-escapeKey = KbName('Escape');                   % let psychtoolbox know what the escape key is
+% let psychtoolbox know what the escape key is
+escapeKey = KbName('Escape');                  
 
 
 %% Psychtoolbox, Stim, Screen Params Init:
@@ -76,12 +70,13 @@ pause(10) % Letting the signal to get stable
 pause(restingTime)
 RestingSignal =  restingStateDelay.OutputPort(1).Data';
 % Cut and clean the signalas needed
-[RestingSignal, ~] = MI_Preprocess(RestingSignal);
+[RestingSignal, ~] = OnlineProc.Preprocess(RestingSignal);
 
 % Show a message the declares that training is about to begin
 DrawFormattedText(window, strcat('The training will begin in few seconds.'), 'center','center', white);
 Screen('Flip', window);
 pause(3)
+
 %% Record Training Stage
 % prepare set of training trials with predefined arrow cues
 trainingVec = Utillity.prepareTraining(numTrials,Classes);  %% Changed the function to be equal trials per condition %%%
@@ -148,7 +143,6 @@ save([recordingFolder, 'EEG'], 'EEG')
 save([recordingFolder, 'RestingSignal'], 'RestingSignal')
 save([recordingFolder, 'parameters'], 'Hz', 'trialLength')
 save(strcat(recordingFolder,'FeatureParam'),'bands');
-disp('finish :)');
 
 % Stop simulink
 set_param(gcs, 'SimulationCommand', 'stop')

@@ -1,5 +1,4 @@
-%% MI Training Scaffolding
-close all; clear; clc;
+%% Online Communication script
 
 %% Set params and setup psychtoolbox & Simulink
 
@@ -10,8 +9,8 @@ IMPobj          = 'USBamp_online/Impedance Check';
 RestDelayobj    = 'USBamp_online/Resting Delay';
 ChunkDelayobj   = 'USBamp_online/Chunk Delay';
 
-% Open Simulink
-open_system(USBobj)
+% open Simulink
+open_system(['Utillity/' USBobj])
 set_param(USBobj,'BlockReduction', 'off')
 
 % Activate parameter gui
@@ -58,7 +57,8 @@ Classes = 1 : nClass;
 
 % Define the keyboard keys that are listened for:
 KbName('UnifyKeyNames');
-escapeKey = KbName('Escape');                   % let psychtoolbox know what the escape key is
+% let psychtoolbox know what the escape key is
+escapeKey = KbName('Escape');                   
 
 %% Load model, params etc.
 
@@ -118,7 +118,7 @@ while runFlag == 1 % Number of trials times number of classes
     [MIData, removeTrial] = OnlineProc.Preprocess(EEG);
     
     % Extract features
-    MIFeatures = OnlineProc.ExtractFeatures(MIData, Hz, bands, f, restingStateBands);
+    MIFeatures = OnlineProc.ExtractFeatures(MIData, Hz, bands, restingStateBands);
     
     % Predict using the pre-trained model
     prediction = model.predict(MIFeatures);

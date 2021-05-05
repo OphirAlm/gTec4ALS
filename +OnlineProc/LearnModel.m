@@ -5,6 +5,7 @@ function [model, validationAccuracy]...
 %% Read Features & Labels
 trials2remove = logical(trials2remove);
 k = 10;
+trees_N = 300;
 
 %Removing bad trials
 feature_mat(trials2remove, :) = [];
@@ -14,8 +15,7 @@ labels(trials2remove) = [];
 % Test with boosting
 datasetTable = [MIFeatures, targetLabels'];
 [model, validationAccuracy] =...
-    ModelFun.trainBaggingClassifier(datasetTable, k, 300);
-
+    ModelFun.trainBaggingClassifier(datasetTable, k, trees_N);
 
 
 %% Test data

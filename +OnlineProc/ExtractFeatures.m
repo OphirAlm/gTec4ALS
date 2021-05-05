@@ -1,5 +1,8 @@
-function [MIFeatures] = ExtractFeatures(MIData, Hz,bands, f, restingStateBands)
+function [MIFeatures] = ExtractFeatures(MIData, Hz,bands, restingStateBands)
 %% This function extracts features for the machine learning process.
+
+% Total frequency range
+f = 4 : 0.1 : 40;
 
 % get number of channels from main data variable
 numChans = size(MIData,1);
