@@ -1,5 +1,5 @@
 function [train_accuracy_m , train_accuracy_sd , val_accuracy_m ,val_accuracy_sd] = ...
-    myClassiff(k , feature_mat , labels , trials2remove)
+    LDA_classify(k , feature_mat , labels , trials2remove)
 %MATLAB R2019b
 %
 %Training and testing linear classifier from the feature matrix. giving
