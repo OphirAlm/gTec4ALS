@@ -12,6 +12,7 @@ targetLabels = TEMP.trainingVec;
 %% Read Features & Labels
 trials2remove = logical(trials2remove);
 k = 10;
+trees_N = 500;
 
 %Removing bad trials
 MIFeatures(trials2remove, :) = [];
@@ -21,7 +22,7 @@ targetLabels(trials2remove) = [];
 % Test with boosting
 datasetTable = [MIFeatures, targetLabels'];
 [model, validationAccuracy] =...
-    ModelFun.trainBaggingClassifier(datasetTable, k, 300);
+    ModelFun.trainBaggingClassifier(datasetTable, k, trees_N);
 
 
 %% Test data

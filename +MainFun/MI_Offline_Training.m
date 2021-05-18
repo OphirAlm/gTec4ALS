@@ -14,18 +14,42 @@ bands{8} = [30, 40];
 
 
 %% Run stimulation and record EEG data
-[recordingFolder,subID] = OfflineProc.Training(bands);
+[recordingFolder,subID, EEG, trainingVec, RestingSignal, Hz, trialLength] = ...
+    Proccessing.OfflineTraining(bands);
+
+% End of Phase message
 disp('Finished Training.');
 
 %% Run pre-processing pipeline on recorded data
-OfflineProc.Preprocess(recordingFolder);
+[MIData, trials2remove] = Proccessing.Preprocess(EEG);
+
+% Save the files
+save(strcat(recordingFolder,'\','MIData.mat'),'MIData');
+save(strcat(recordingFolder,'\','EEG_chans.mat'),'EEG_chans');
+
+% End of Phase message
 disp('Finished pre-processing the data.');
 
-
 %% Extract features
-OfflineProc.ExtractFeatures(recordingFolder);
+[MIFeatures] = Proccessing.ExtractFeatures(MIData, Hz, bands, restingStateBands);
+
+% Save the files
+save(strcat(recordingFolder,'\MIFeatures.mat'),'MIFeatures');
+save(strcat(recordingFolder,'\FeatureParam.mat'),'bands', 'f');
+
+% End of Phase message
 disp('Finished extracting features.');
 
 %% Train a model 
-OfflineProc.LearnModel(recordingFolder);
+[model, validationAccuracy]...
+    = Proccessing.LearnModel(MIFeatures, trainingVec, trials2remove, recordingFolder);
+
+
+% Printing the model accuracy
+disp(['Mean validation accuracy - ' num2str(validationAccuracy * 100) '%'])
+
+% Saving the model
+save(strcat(recordingFolder,'\RF_model.mat'), 'model')
+
+% End of Phase message
 disp('Finished training the model.');

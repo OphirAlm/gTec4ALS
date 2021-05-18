@@ -1,6 +1,7 @@
 %% MI Training Scaffolding
 
-function [recordingFolder,subID] = Training(bands)
+function [recordingFolder,subID, EEG, trainingVec, RestingSignal, ...
+    Hz, trialLength] = Training(bands)
 %% Set params and setup psychtoolbox & Simulink
 % define objects' strings for Simulink objects
 USBobj          = 'USBamp_offline';
@@ -80,7 +81,6 @@ pause(3)
 %% Record Training Stage
 % prepare set of training trials with predefined arrow cues
 trainingVec = Utillity.prepareTraining(numTrials,Classes);  %% Changed the function to be equal trials per condition %%%
-save(strcat(recordingFolder,'trainingVec.mat'),'trainingVec');
 pause(0.2);
 
 % for each trial:
@@ -139,6 +139,7 @@ end
 ShowCursor;
 sca;
 Priority(0);
+save(strcat(recordingFolder,'trainingVec.mat'),'trainingVec');
 save([recordingFolder, 'EEG'], 'EEG')
 save([recordingFolder, 'RestingSignal'], 'RestingSignal')
 save([recordingFolder, 'parameters'], 'Hz', 'trialLength')

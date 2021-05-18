@@ -127,7 +127,7 @@ pause(restingTime)          % Pause for the resting state time
 
 % Extract resting state signal and preprocess it
 RestingSignal       = restingStateDelay.OutputPort(1).Data';
-[RestingMI, ~]      = OnlineProc.Preprocess(RestingSignal);
+[RestingMI, ~]      = Proccessing.Preprocess(RestingSignal);
 restingStateBands   = EEGFun.restingState(RestingMI, bands, Hz);
 
 % Show a message that declares that training is about to begin
@@ -201,11 +201,11 @@ for trial = 1 : numTrials * nClass % Number of trials times number of classes
         labels(chunk_i) = currentTrial;
         
         % Clean signal
-        [MIData, removeTrial] = OnlineProc.Preprocess(EEG(:, :, chunk_i));
+        [MIData, removeTrial] = Proccessing.Preprocess(EEG(:, :, chunk_i));
         trials2remove(chunk_i) = removeTrial; %Flag is trial is noisy
         
         % Extract features
-        MIFeatures(chunk_i, :) = OnlineProc.ExtractFeatures(MIData, Hz, bands, f, restingStateBands);
+        MIFeatures(chunk_i, :) = Proccessing.ExtractFeatures(MIData, Hz, bands, f, restingStateBands);
         
         % Predict using the pre-trained model
         prediction = model.predict(MIFeatures(chunk_i, :));
@@ -315,10 +315,10 @@ save([recordingFolder, 'accumilateLabels'], 'accumilateLabels')
 if ~accumilationFlag
     %Train new model
     [trainedClassifier, validationAccuracy]...
-        = OnlineProc.LearnModel(MIFeatures, labels, trials2remove, recordingFolder);
+        = Proccessing.LearnModel(MIFeatures, labels, trials2remove, recordingFolder);
 else
     [trainedClassifier, validationAccuracy]...
-        = OnlineProc.LearnModel(MIAccumilate, accumilateLabels, removeAccumilate, recordingFolder);
+        = Proccessing.LearnModel(MIAccumilate, accumilateLabels, removeAccumilate, recordingFolder);
 end
 
 %Rename folder with new model accuracy
