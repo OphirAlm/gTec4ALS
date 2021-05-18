@@ -58,7 +58,7 @@ Classes = 1 : nClass;
 % Define the keyboard keys that are listened for:
 KbName('UnifyKeyNames');
 % let psychtoolbox know what the escape key is
-escapeKey = KbName('Escape');                   
+escapeKey = KbName('Escape');
 
 %% Load model, params etc.
 
@@ -97,6 +97,21 @@ ShowCursor;
 sca;
 Priority(0);
 Screen('close')
+
+%% First State Of KeyBoard GUI
+State.position = [0 0 0 0 1 0 0 0 0];
+State.screen = 'Main';
+keyboardHanle = figure;
+
+% Display KeyBoard
+Utillity.KeyBoardGUI(State, keyboardHanle)
+
+% String to speak
+string = '';
+
+% Text to speech gender
+male = 'Microsoft David Desktop - English (United States)';
+female = 'Microsoft Zira Desktop - English (United States)';
 %% Record Training Stage
 
 runFlag = 1;
@@ -128,11 +143,37 @@ while runFlag == 1 % Number of trials times number of classes
         prediction = 1;
     end
     
-    %Write the result to a txt file
-    pred_str = num2str(prediction);
-    txtFile = fopen('Action.txt', 'w');
-    fprintf(txtFile, pred_str);
-    fclose(txtFile);
+    % Update state
+    [State, output] = Utillity.stateUpdate(State, prediction);
+    if output ~= 0
+        if strcmp(output, 'Send')
+            Utillity.tts(string, female)
+            % Reset string
+            string = '';
+        elseif strcmp(output, 'Help')
+            % Change string to help
+            string = 'I Need Help';
+            % Say 3 times help is needed
+            for i = 1 : 3
+                Utillity.tts(string, female)
+                pause(1)
+            end
+            % Reset the string
+            string = '';
+        else
+            % Add character to string
+            string(end + 1) = output;
+        end
+    end
+    
+    % Display KeyBoard
+    Utillity.KeyBoardGUI(State, keyboardHanle)
+    
+    %     %Write the result to a txt file
+    %     pred_str = num2str(prediction);
+    %     txtFile = fopen('Action.txt', 'w');
+    %     fprintf(txtFile, pred_str);
+    %     fclose(txtFile);
 end
 
 %Stop simulink
