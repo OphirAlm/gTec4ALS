@@ -1,4 +1,4 @@
-function KeyBoardGUI(state, handle)
+function KeyBoardGUI(state, handle, text_str)
 
 
 % Rectangle Positions according to the current screen
@@ -35,5 +35,7 @@ axes(handle)
 img = imread([pwd, '\LoadingPics\' state.screen '.jpg']);
 % Draw rectangle
 img = insertShape(img,'Rectangle',positions(logical(state.position), :),'LineWidth',6, 'Color', 'red', 'Opacity', 1);
+img = insertText(img, [640 685], text_str, 'FontSize', 50, 'AnchorPoint',...
+    'Center', 'BoxOpacity', 0, 'TextColor', 'white');
 % Show the image
 imshow(img)

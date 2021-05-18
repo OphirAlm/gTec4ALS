@@ -99,12 +99,13 @@ Priority(0);
 Screen('close')
 
 %% First State Of KeyBoard GUI
+% Initiall state for main menu
 State.position = [0 0 0 0 1 0 0 0 0];
 State.screen = 'Main';
 keyboardHanle = figure;
 
 % Display KeyBoard
-Utillity.KeyBoardGUI(State, keyboardHanle)
+Utillity.KeyBoardGUI(State, keyboardHanle, string)
 
 % String to speak
 string = '';
@@ -167,7 +168,7 @@ while runFlag == 1 % Number of trials times number of classes
     end
     
     % Display KeyBoard
-    Utillity.KeyBoardGUI(State, keyboardHanle)
+    Utillity.KeyBoardGUI(State, keyboardHanle, string)
     
     %     %Write the result to a txt file
     %     pred_str = num2str(prediction);

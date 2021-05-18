@@ -4,11 +4,11 @@ State.position = [0 0 0 0 1 0 0 0 0];
 State.screen = 'Main';
 keyboardHanle = figure;
 
-% Display KeyBoard
-Utillity.KeyBoardGUI(State, keyboardHanle)
-
 % String to speak
 string = '';
+
+% Display KeyBoard
+Utillity.KeyBoardGUI(State, keyboardHanle, string)
 
 % Text to speech gender
 male = 'Microsoft David Desktop - English (United States)';
@@ -44,6 +44,6 @@ for i = 1 : length(pred)
     
     % Display KeyBoard
     clf(keyboardHanle)
-    Utillity.KeyBoardGUI(State, keyboardHanle)
+    Utillity.KeyBoardGUI(State, keyboardHanle, string)
     pause(1)
 end
