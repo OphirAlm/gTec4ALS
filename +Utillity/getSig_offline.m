@@ -1,9 +1,9 @@
-
 function getSig_offline(session_runtime)
-modelName = 'USBamp_offline';
-global signal
+% Runs the Simulink offline model
 
-if isempty(find_system('Type','block_diagram','Name',modelName)),
+modelName = 'USBamp_offline';
+
+if isempty(find_system('Type','block_diagram','Name',modelName))
     load_system(modelName);
 end
 
@@ -15,7 +15,6 @@ Scope = struct(...
     'blockFcn',[]);
 
 Scope.blockName = sprintf('%s/Scope',modelName);
-% Scope.blockName = sprintf('%s/Out1',modelName);
 Scope.blockHandle = get_param(Scope.blockName,'Handle');
 Scope.blockEvent = 'PostOutputs';
 Scope.blockFcn = @ScopeCallback;
@@ -26,7 +25,4 @@ set_param(modelName,'StopTime', num2str(session_runtime));
 
 eventHandle = add_exec_event_listener(Scope.blockName,Scope.blockEvent, Scope.blockFcn);
 
-% rawSignal = zeros(16,1);
-% curSignal = Scope.blockFcn;
-% rawSignal = [rawSignal, ];
 end

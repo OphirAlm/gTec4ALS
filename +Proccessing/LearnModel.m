@@ -1,18 +1,28 @@
 function [model, validationAccuracy]...
     = LearnModel(MIFeatures, targetLabels, trials2remove, recordingFolder)
+% Train ML Model according to the extracted features.
+%
+% model - ML Object.
+% validationAccuracy - Cross validation mean accuracy of the model.
+%
+% MIFeatures - Matrix of the features per trial (trials in rows features in
+% columns)
+%targetLAbels - Vector of labels per trial.
+% trials2remove - Vector of trials to remove (Noise\ Artifacts).
+% recordingFolder - Folder to save in the new model.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-%% Read Features & Labels
+% Read Features & Labels
 trials2remove = logical(trials2remove);
 k = 10;
 trees_N = 300;
 
 %Removing bad trials
-feature_mat(trials2remove, :) = [];
-labels(trials2remove) = [];
+MIFeatures(trials2remove, :) = [];
+targetLabels(trials2remove) = [];
 
-
-% Test with boosting
+% Train with boosting
 datasetTable = [MIFeatures, targetLabels'];
 [model, validationAccuracy] =...
     ModelFun.trainBaggingClassifier(datasetTable, k, trees_N);

@@ -1,5 +1,8 @@
 function KeyBoardGUI(state, handle, text_str)
-
+% Loading the screen that suit the current state, and draw a red rectangle
+% in the current state location.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Rectangle Positions according to the current screen
 if length(state.position) == 9

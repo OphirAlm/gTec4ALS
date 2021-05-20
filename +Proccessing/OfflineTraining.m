@@ -1,7 +1,7 @@
-%% MI Training Scaffolding
-
+%% Offline MI Training
 function [recordingFolder,subID, EEG, trainingVec, RestingSignal, ...
-    Hz, trialLength] = Training(bands)
+    Hz, trialLength] = OfflineTraining(bands)
+% Runs an offline training session.
 %% Set params and setup psychtoolbox & Simulink
 % define objects' strings for Simulink objects
 USBobj          = 'USBamp_offline';

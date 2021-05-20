@@ -1,4 +1,7 @@
 function [newState, output] = stateUpdate(currentState, Command)
+% Getting the input command, and changes the state of the system (screen
+% and pointer position).
+
 
 % Default Output is None.
 output = 0;

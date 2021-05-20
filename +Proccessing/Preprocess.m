@@ -1,10 +1,22 @@
 %% Offline Preprocessing
-function [MIData, removeTrial] = Preprocess(raw_EEG)
-%% Some parameters (this needs to change according to your system):
+function [MIData, removeTrial] = Preprocess(raw_EEG, maxAmp)
+% Cleans the signal using laplace, arrange relevant electrodes and return
+% the wanted EEG signal.
+%
+% MIData - Segmented EEG signal (trials in rows, sampels in columns)
+% removeTrial - Vector of trials to remove (Noise\ Artifacts).
+% maxAmp - The amplitude which above or below (Negative) the trial will be
+% classiffied as noisy (Defaults 150 micro-V).
+% raw_EEG - Raw signal as recieved from the g.tec recorde.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% update channel names - each group should update this according to
-% their own G.tec setup.
+% Set defualt maxAmp value
+if nargin < 2
+    maxAmp = 150;
+end
 
+% update channel names
 EEG_chans(1,:) = 'FC3';
 EEG_chans(2,:) = 'FCz';
 EEG_chans(3,:) = 'FC4';
@@ -22,8 +34,8 @@ EEG_chans(14,:) = 'CP2';
 EEG_chans(15,:) = 'CP4';
 EEG_chans(16,:) = 'Fzz';
 
+% Get number of channels
 numChans = size(EEG_chans,1);
-
 
 %% Laplace
 % INSERT the chosen electrode (C03, C04, Cz must be first and in that
@@ -74,8 +86,8 @@ raw_EEG(midInd, :, :) = raw_EEG(midInd, :, :) - ref_mid;
 MIData = raw_EEG(elecIndex,: , :);
 
 %Label as noisy trial
-over_max = max(MIData, [], 2) > 150;
-below_min = min(MIData, [], 2) < -150;
+over_max = max(MIData, [], 2) > maxAmp;
+below_min = min(MIData, [], 2) < -maxAmp;
 if sum(over_max & below_min) == 1
     removeTrial = 1;
 else

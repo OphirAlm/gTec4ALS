@@ -1,5 +1,15 @@
 function [MIFeatures] = ExtractFeatures(MIData, Hz, bands, restingStateBands)
-%% This function extracts features for the machine learning process.
+% Extract feauters from the segmented EEG data.
+%
+% MIFeatures - Matrix of the features per trial (trials in rows features in
+% columns)
+%
+% MIData - Segmented EEG signal (trials in rows, sampels in columns)
+% Hz - Signal sampling rate
+% bands - The power bands to extract features from.
+% restingStateBands - Resting state power recorded per band
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Total frequency range
 f = 4 : 0.1 : 40;

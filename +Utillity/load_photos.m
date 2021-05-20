@@ -1,4 +1,6 @@
 function [Arrow, Idle, Mark] = load_photos()
+% Loading the photos for the online Training phase
+
 
 % load arrow image
 Arrow{1} = imread('LoadingPics\Right_0.jpg');
