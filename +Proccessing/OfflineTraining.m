@@ -1,6 +1,6 @@
 %% Offline MI Training
 function [recordingFolder,subID, EEG, trainingVec, RestingSignal, ...
-    Hz, trialLength] = OfflineTraining(bands)
+    Hz, trialLength] = OfflineTraining
 % Runs an offline training session.
 %% Set params and setup psychtoolbox & Simulink
 % define objects' strings for Simulink objects
@@ -71,7 +71,7 @@ pause(10) % Letting the signal to get stable
 pause(restingTime)
 RestingSignal =  restingStateDelay.OutputPort(1).Data';
 % Cut and clean the signalas needed
-[RestingSignal, ~] = OnlineProc.Preprocess(RestingSignal);
+[RestingSignal, ~] = Proccessing.Preprocess(RestingSignal);
 
 % Show a message the declares that training is about to begin
 DrawFormattedText(window, strcat('The training will begin in few seconds.'), 'center','center', white);
@@ -143,7 +143,6 @@ save(strcat(recordingFolder,'trainingVec.mat'),'trainingVec');
 save([recordingFolder, 'EEG'], 'EEG')
 save([recordingFolder, 'RestingSignal'], 'RestingSignal')
 save([recordingFolder, 'parameters'], 'Hz', 'trialLength')
-save(strcat(recordingFolder,'FeatureParam'),'bands');
 
 % Stop simulink
 set_param(gcs, 'SimulationCommand', 'stop')

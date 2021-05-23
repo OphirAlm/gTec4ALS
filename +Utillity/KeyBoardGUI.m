@@ -4,6 +4,9 @@ function KeyBoardGUI(state, handle, text_str)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% Clear figure
+clf(handle)
+
 % Rectangle Positions according to the current screen
 if length(state.position) == 9
     positions = [57 35.5000000000001 402 186;...
@@ -33,12 +36,25 @@ elseif length(state.position) == 7
 end
 
 % Choose axes to the current handle
-axes(handle)
+figure(handle)
+hAx  = gca;
+
+% set the axes to full screen
+set(hAx, 'Unit', 'normalized', 'Position',[0 0 1 1]);
+
 % Load image
 img = imread([pwd, '\LoadingPics\' state.screen '.jpg']);
+
 % Draw rectangle
 img = insertShape(img,'Rectangle',positions(logical(state.position), :),'LineWidth',6, 'Color', 'red', 'Opacity', 1);
 img = insertText(img, [640 685], text_str, 'FontSize', 50, 'AnchorPoint',...
     'Center', 'BoxOpacity', 0, 'TextColor', 'white');
+
 % Show the image
 imshow(img)
+
+% Set background color
+set(hAx, 'color', 'black');
+
+drawnow
+

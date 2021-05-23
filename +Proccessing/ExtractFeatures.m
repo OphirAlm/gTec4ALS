@@ -1,4 +1,4 @@
-function [MIFeatures] = ExtractFeatures(MIData, Hz, bands, restingStateBands)
+function [MIFeatures, f] = ExtractFeatures(MIData, Hz, bands, restingStateBands)
 % Extract feauters from the segmented EEG data.
 %
 % MIFeatures - Matrix of the features per trial (trials in rows features in
@@ -20,13 +20,16 @@ numChans = size(MIData,1);
 % how many bands overall exist
 bands_N = length(bands);
 
+% Get number of trials
+trials_N = size(MIData, 3);
+
 % init features+labels matrix
-MIFeaturesLabel = NaN(numChans,bands_N);
+MIFeaturesLabel = NaN(numChans, bands_N, trials_N);
 
 %% Extract features
 for channel = 1:numChans
     
-    %Power and total power
+    % Bands power and total power
     tot_power = bandpower(squeeze(MIData(channel,:)),Hz,[f(1), f(end)]);
     alpha_power = bandpower(squeeze(MIData(channel,:)),Hz,[8, 12]);
     beta_power = bandpower(squeeze(MIData(channel,:)),Hz,[12, 30]);
@@ -35,32 +38,32 @@ for channel = 1:numChans
     gamma_power = bandpower(squeeze(MIData(channel,:)),Hz,[30, 40]);
     
     n = 1;
-    %Band power features
+    % Band power features
     for band_i = 1:bands_N
         % Extract bandpower
-        MIFeaturesLabel(channel, n) = ...
+        MIFeaturesLabel(channel, n, :) = ...
             bandpower(squeeze(MIData(channel, :, :)),Hz,bands{band_i});
         % Extract relaitve band power to the resting state power.
-        MIFeaturesLabel(channel, n + 1) = ...
-            MIFeaturesLabel(channel, n) ./ restingStateBands(channel, band_i);
+        MIFeaturesLabel(channel, n + 1, :) = ...
+            MIFeaturesLabel(channel, n, :) ./ restingStateBands(channel, band_i);
         % Extract relaitve band power (relative to total power and each
         % power band)
-        MIFeaturesLabel(channel, n + 2) = ...
-            MIFeaturesLabel(channel, n) ./ tot_power';
-        MIFeaturesLabel(channel, n + 3) = ...
-            MIFeaturesLabel(channel, n) ./ alpha_power';
-        MIFeaturesLabel(channel, n + 4) = ...
+        MIFeaturesLabel(channel, n + 2, :) = ...
+            MIFeaturesLabel(channel, n, :) ./ tot_power';
+        MIFeaturesLabel(channel, n + 3, :) = ...
+            MIFeaturesLabel(channel, n, :) ./ alpha_power';
+        MIFeaturesLabel(channel, n + 4, :) = ...
             MIFeaturesLabel(channel, n) ./ beta_power';
-        MIFeaturesLabel(channel, n + 5) = ...
+        MIFeaturesLabel(channel, n + 5, :) = ...
             MIFeaturesLabel(channel, n) ./ theta_power';
-        MIFeaturesLabel(channel, n + 6) = ...
+        MIFeaturesLabel(channel, n + 6, :) = ...
             MIFeaturesLabel(channel, n) ./ mu_power';
-        MIFeaturesLabel(channel, n + 7) = ...
+        MIFeaturesLabel(channel, n + 7, :) = ...
             MIFeaturesLabel(channel, n) ./ gamma_power';
         n = n + 8;
     end
     %sqrt total power feature
-    MIFeaturesLabel(channel, n) = sqrt(tot_power);
+    MIFeaturesLabel(channel, n, :) = sqrt(tot_power);
     n = n + 1;
     
     % Power
@@ -70,19 +73,19 @@ for channel = 1:numChans
     prob_f = EEGFun.Probably(power)';
     
     %Spectral moment feature
-    MIFeaturesLabel(channel, n) = f * prob_f ;
+    MIFeaturesLabel(channel, n, :) = f * prob_f ;
     n = n + 1;
     
     %Spectral edge
-    MIFeaturesLabel(channel, n) = EEGFun.precen(prob_f' , 0.9, f);
+    MIFeaturesLabel(channel, n, :) = EEGFun.precen(prob_f' , 0.9, f);
     n = n + 1;
     
     %Spectral entropy
-    MIFeaturesLabel(channel, n) = -sum(prob_f .* log2(prob_f),1);
+    MIFeaturesLabel(channel, n, :) = -sum(prob_f .* log2(prob_f),1);
 end
 
 % Reshape into 2-D matrix
-MIFeatures = reshape(MIFeaturesLabel,1 ,numChans * (bands_N * 8 + 4) );
+MIFeatures = reshape(MIFeaturesLabel,trials_N ,numChans * (bands_N * 8 + 4));
 
 
 

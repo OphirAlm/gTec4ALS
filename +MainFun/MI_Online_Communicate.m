@@ -28,26 +28,6 @@ rto                = get_param(ChunkDelayobj,'RuntimeObject');
 fullPath = uigetdir(['C:/Subjects/Sub' num2str(subID) '/'], ...
     'Choose Desired Directory');
 
-%% Psychtoolbox, Stim, Screen Params Init:
-
-% Set resolution
-% Looking for nearest resolution available to 1980x1080, 60Hz, pixel sz 32.
-% res = NearestResolution(2,[1980, 1080, 60, 32]);
-% Seting this resolution
-% SetResolution(1, res);
-
-disp('Setting up Psychtoolbox parameters...');
-disp('This will open a black screen - good luck!');
-
-%%% For debugging, change 1 to 0.5 (opaquaness of the screen) %%%
-PsychDebugWindowConfiguration(0,1);
-%%% Change to 1 if in debugging mode %%%
-Screen('Preference', 'SkipSyncTests', 0);
-
-% Initialize Psychtoolbox
-[window,white,black,screenXpixels,screenYpixels,xCenter,yCenter,ifi] = Utillity.PsychInit();
-topPriorityLevel = MaxPriority(window);
-Priority(topPriorityLevel);
 
 
 %% Load photos
@@ -72,43 +52,55 @@ load(strcat(fullPath,'\FeatureParam.mat'), 'bands','f')
 assert(nClass == length(model.ClassNames), ...
     'number of chosen classes and number of model classes are uneven!');
 
+%% Display Setup
+figure('units','normalized','outerPosition',[1 0 1 1]);
+ 
+ % get the figure and axes handles
+ MainFig = gcf;
+ hAx  = gca;
+ 
+ % set the axes to full screen
+ set(hAx,'Unit','normalized','Position',[0 0 1 1]);
+ % hide the toolbar
+ set(MainFig,'menubar','none')
+ % to hide the title
+ set(MainFig,'NumberTitle','off');
+ % Set background color
+ set(hAx,'color', 'black');
+
+ hText = text(0.5,0.5 ,...
+     ['Just rest for now.' sprintf('\n') 'The Communication Program will begin soon.'], ...
+     'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
+
 %% Record Resteing State Stage
-DrawFormattedText(window, strcat(...
-    ['Just rest for now. \n' 'The Communication Program will begin soon.']),...
-    'center','center', white);
-Screen('Flip', window);     % Adjust screen
+
 pause(10)                   % Letting the signal time to stabalize
 pause(restingTime)          % Pause for the resting state time
 
 % Extract resting state signal and preprocess it
 RestingSignal       = restingStateDelay.OutputPort(1).Data';
-[RestingMI, ~]      = OnlineProc.Preprocess(RestingSignal);
+[RestingMI, ~]      = Proccessing.Preprocess(RestingSignal);
 restingStateBands   = EEGFun.restingState(RestingMI, bands, Hz);
 
 % Show a message that declares that training is about to begin
-DrawFormattedText(window, strcat(...
-    'The Communication Progaram will begin in few seconds.'),...
-    'center','center', white);
-Screen('Flip', window);     % Adjust screen
+delete(hText)
+hText = text(0.5,0.5 ,...
+     'The Communication Program will begin in few seconds.', ...
+     'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
 pause(3)
 
-% Close PsychToolBox
-ShowCursor;
-sca;
-Priority(0);
-Screen('close')
 
 %% First State Of KeyBoard GUI
 % Initiall state for main menu
 State.position = [0 0 0 0 1 0 0 0 0];
 State.screen = 'Main';
-keyboardHanle = figure;
 
-% Display KeyBoard
-Utillity.KeyBoardGUI(State, keyboardHanle, string)
 
 % String to speak
-string = '';
+outputText = '';
+
+% Display KeyBoard
+Utillity.KeyBoardGUI(State, MainFig, outputText)
 
 % Text to speech gender
 male = 'Microsoft David Desktop - English (United States)';
@@ -131,10 +123,10 @@ while runFlag == 1 % Number of trials times number of classes
     EEG = rto.OutputPort(1).Data';
     
     % Clean signal
-    [MIData, removeTrial] = OnlineProc.Preprocess(EEG);
+    [MIData, removeTrial] = Proccessing.Preprocess(EEG);
     
     % Extract features
-    MIFeatures = OnlineProc.ExtractFeatures(MIData, Hz, bands, restingStateBands);
+    MIFeatures = Proccessing.ExtractFeatures(MIData, Hz, bands, restingStateBands);
     
     % Predict using the pre-trained model
     prediction = model.predict(MIFeatures);
@@ -143,32 +135,32 @@ while runFlag == 1 % Number of trials times number of classes
     if removeTrial == 1
         prediction = 1;
     end
-    
+        
     % Update state
     [State, output] = Utillity.stateUpdate(State, prediction);
     if output ~= 0
         if strcmp(output, 'Send')
-            Utillity.tts(string, female)
+            Utillity.tts(outputText, female)
             % Reset string
-            string = '';
+            outputText = '';
         elseif strcmp(output, 'Help')
             % Change string to help
-            string = 'I Need Help';
+            outputText = 'I Need Help';
             % Say 3 times help is needed
             for i = 1 : 3
-                Utillity.tts(string, female)
+                Utillity.tts(outputText, female)
                 pause(1)
             end
             % Reset the string
-            string = '';
+            outputText = '';
         else
             % Add character to string
-            string(end + 1) = output;
+            outputText(end + 1) = output;
         end
     end
     
     % Display KeyBoard
-    Utillity.KeyBoardGUI(State, keyboardHanle, string)
+    Utillity.KeyBoardGUI(State, MainFig, outputText)
     
     %     %Write the result to a txt file
     %     pred_str = num2str(prediction);

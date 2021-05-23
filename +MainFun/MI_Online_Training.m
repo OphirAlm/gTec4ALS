@@ -205,7 +205,7 @@ for trial = 1 : numTrials * nClass % Number of trials times number of classes
         trials2remove(chunk_i) = removeTrial; %Flag is trial is noisy
         
         % Extract features
-        MIFeatures(chunk_i, :) = Proccessing.ExtractFeatures(MIData, Hz, bands, f, restingStateBands);
+        MIFeatures(chunk_i, :) = Proccessing.ExtractFeatures(MIData, Hz, bands, restingStateBands);
         
         % Predict using the pre-trained model
         prediction = model.predict(MIFeatures(chunk_i, :));

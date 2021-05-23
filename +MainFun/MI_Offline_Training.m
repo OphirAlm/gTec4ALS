@@ -15,7 +15,7 @@ bands{8} = [30, 40];
 
 %% Run stimulation and record EEG data
 [recordingFolder,subID, EEG, trainingVec, RestingSignal, Hz, trialLength] = ...
-    Proccessing.OfflineTraining(bands);
+    Proccessing.OfflineTraining;
 
 % End of Phase message
 disp('Finished Training.');
@@ -25,13 +25,12 @@ disp('Finished Training.');
 
 % Save the files
 save(strcat(recordingFolder,'\','MIData.mat'),'MIData');
-save(strcat(recordingFolder,'\','EEG_chans.mat'),'EEG_chans');
 
 % End of Phase message
 disp('Finished pre-processing the data.');
 
 %% Extract features
-[MIFeatures] = Proccessing.ExtractFeatures(MIData, Hz, bands, restingStateBands);
+[MIFeatures, f] = Proccessing.ExtractFeatures(MIData, Hz, bands, RestingSignal);
 
 % Save the files
 save(strcat(recordingFolder,'\MIFeatures.mat'),'MIFeatures');
