@@ -43,7 +43,7 @@ elseif Command == 4
     % Get options per current screen
     if strcmp(currentState.screen, 'Main')
         opts = [{'A-E'}, {'F-K'}, {'L-P'}, {'Q-U'}, {'V-Z'}, {'numMenu'}, {'Space'},...
-            {'Send'}, {'Help'}];
+            {'Send'}, {'Lock'}];
     elseif strcmp(currentState.screen, 'A-E')
         opts = [{'A'}, {'B'}, {'C'}, {'D'}, {'E'}, {'Back'}];
     elseif strcmp(currentState.screen, 'F-K')
@@ -55,7 +55,7 @@ elseif Command == 4
     elseif strcmp(currentState.screen, 'V-Z')
         opts = [{'V'}, {'W'}, {'X'}, {'Y'}, {'Z'}, {'Back'}];
     elseif strcmp(currentState.screen, 'numMenu')
-        opts = [{'0-4'}, {'5-9'}, {'?'}, {'.'}, {'!'}, {','}, {'Back'}];
+        opts = [{'0-4'}, {'5-9'}, {'?'}, {'.'}, {'!'}, {'Backspace'}, {'Back'}];
     elseif strcmp(currentState.screen, '0-4')
         opts = [{'0'}, {'1'}, {'2'}, {'3'}, {'4'}, {'Back'}];
     elseif strcmp(currentState.screen, '5-9')
@@ -83,7 +83,7 @@ elseif Command == 4
             newState.screen = 'Main';
             % Return Help
         elseif idx == 9
-            output = 'Help';
+            output = 'Lock';
             newState.position = [0 0 0 0 1 0 0 0 0];
             newState.screen = 'Main';
         end
@@ -191,7 +191,5 @@ elseif Command == 4
     end
 end
 
-
-a =1;
 
 

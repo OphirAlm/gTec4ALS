@@ -4,7 +4,6 @@ function LearnModel_AllRec()
 % The new model will be saved in a new subfolder in the choosen directory.
 
 %% Read Features & Labels
-
 recordingFolder = uigetdir('C:/Subjects/', ...
     'Choose Desired Directory');
 
@@ -42,7 +41,7 @@ trials2remove = logical(trials2remove);
 
 
 k = 5;
-trees_N = 300;
+trees_N = 500;
 
 %Removing bad trials
 MIFeatures(trials2remove, :) = [];
@@ -52,7 +51,7 @@ targetLabels(trials2remove) = [];
 % Test with boosting
 datasetTable = [MIFeatures, targetLabels'];
 [model, validationAccuracy] =...
-    trainBoostClassifier(datasetTable, k, trees_N);
+    ModelFun.trainBaggingClassifier(datasetTable, k, trees_N);
 
 %% Test data
 %Printing the results

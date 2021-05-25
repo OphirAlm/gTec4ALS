@@ -32,6 +32,7 @@ date = date(1 : end - 3);
 date = strrep(date,':','-');
 
 Classes = 1 : numClass;
+numClass = length(Classes);
 recordingFolder = strcat('C:\Subjects\Sub',num2str(subID),'\offline- ',date,'\');   %%% Change the path if needed %%%
 mkdir(recordingFolder);
 idleSign = imread('./LoadingPics/idleSign.jpg');              % (1) load idle sign
