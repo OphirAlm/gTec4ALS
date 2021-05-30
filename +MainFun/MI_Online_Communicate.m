@@ -32,8 +32,8 @@ fullPath = uigetdir(['C:/Subjects/Sub' num2str(subID) '/'], ...
 
 %% Load photos
 
-% Set classes' numbers vector
-Classes = 1 : nClass;
+% % % Set classes' numbers vector
+% % % Classes = 1 : nClass;
 
 % Define the keyboard keys that are listened for:
 KbName('UnifyKeyNames');
@@ -49,28 +49,28 @@ load(strcat(fullPath,'\RF_model.mat'), 'model')
 load(strcat(fullPath,'\FeatureParam.mat'), 'bands','f')
 
 % Sanity check - number of classes
-assert(nClass == length(model.ClassNames), ...
-    'number of chosen classes and number of model classes are uneven!');
+% % % assert(nClass == length(model.ClassNames), ...
+% % %     'number of chosen classes and number of model classes are uneven!');
 
 %% Display Setup
 figure('units','normalized','outerPosition',[1 0 1 1]);
- 
- % get the figure and axes handles
- MainFig = gcf;
- hAx  = gca;
- 
- % set the axes to full screen
- set(hAx,'Unit','normalized','Position',[0 0 1 1]);
- % hide the toolbar
- set(MainFig,'menubar','none')
- % to hide the title
- set(MainFig,'NumberTitle','off');
- % Set background color
- set(hAx,'color', 'black');
 
- hText = text(0.5,0.5 ,...
-     ['Just rest for now.' sprintf('\n') 'The Communication Program will begin soon.'], ...
-     'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
+% get the figure and axes handles
+MainFig = gcf;
+hAx  = gca;
+
+% set the axes to full screen
+set(hAx,'Unit','normalized','Position',[0 0 1 1]);
+% hide the toolbar
+set(MainFig,'menubar','none')
+% to hide the title
+set(MainFig,'NumberTitle','off');
+% Set background color
+set(hAx,'color', 'black');
+
+hText = text(0.5,0.5 ,...
+    ['Just rest for now.' sprintf('\n') 'The Communication Program will begin soon.'], ...
+    'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
 
 %% Record Resteing State Stage
 
@@ -85,8 +85,8 @@ restingStateBands   = EEGFun.restingState(RestingMI, bands, Hz);
 % Show a message that declares that training is about to begin
 delete(hText)
 hText = text(0.5,0.5 ,...
-     'The Communication Program will begin in few seconds.', ...
-     'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
+    'The Communication Program will begin in few seconds.', ...
+    'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
 pause(3)
 
 
@@ -108,8 +108,20 @@ female = 'Microsoft Zira Desktop - English (United States)';
 %% Record Training Stage
 
 runFlag = 1;
+lockedFlag = 0;
+idleCount = 0;
+
 % For each trial:
 while runFlag == 1 % Number of trials times number of classes
+    
+    % Certianty level
+    certainty = 0.35;
+    if lockedFlag
+        certainty = 0.6;
+    end
+    
+    % Accumulate chunk
+    pause(trialLength + 0.5)
     
     % Check Keyboard press - Escape key set for shutting down the program
     [keyIsDown,secs, keyCode] = KbCheck;
@@ -129,44 +141,56 @@ while runFlag == 1 % Number of trials times number of classes
     MIFeatures = Proccessing.ExtractFeatures(MIData, Hz, bands, restingStateBands);
     
     % Predict using the pre-trained model
-    prediction = model.predict(MIFeatures);
+    [prediction, scores] = predict(model, MIFeatures);
+    
     
     % If the trial was noisy, classify as idle
     if removeTrial == 1
         prediction = 1;
+        % If the model was not sure, classify as idle
+    elseif max(scores) < certainty
+        prediction = 1;
     end
-        
+    
+    % Add or reset the idle count
+    if prediction == 1
+        idleCount = idleCount + 1;
+    else
+        idleCount = 0;
+    end
+    
+    % After 4 idles, choose the current sqaure
+    if idleCount == 4
+        idleCount = 0;
+        prediction = 4;
+    end
+    
     % Update state
     [State, output] = Utillity.stateUpdate(State, prediction);
     if output ~= 0
         if strcmp(output, 'Send')
-            Utillity.tts(outputText, female)
+            Utillity.tts(lower(outputText), female)
             % Reset string
             outputText = '';
-        elseif strcmp(output, 'Help')
-            % Change string to help
-            outputText = 'I Need Help';
-            % Say 3 times help is needed
-            for i = 1 : 3
-                Utillity.tts(outputText, female)
-                pause(1)
-            end
-            % Reset the string
-            outputText = '';
+        elseif strcmp(output, 'Lock') && lockedFlag == 0
+            % Lock the keyboard
+            lockedFlag = 1;
+            Utillity.tts('Keyboard Locked', female)
+        elseif strcmp(output, 'Backspace')
+            % Remoce character
+            outputText(end) = '';
         else
             % Add character to string
             outputText(end + 1) = output;
         end
     end
     
+    
+    disp(prediction)
+    disp(scores)
+    
     % Display KeyBoard
     Utillity.KeyBoardGUI(State, MainFig, outputText)
-    
-    %     %Write the result to a txt file
-    %     pred_str = num2str(prediction);
-    %     txtFile = fopen('Action.txt', 'w');
-    %     fprintf(txtFile, pred_str);
-    %     fclose(txtFile);
 end
 
 %Stop simulink

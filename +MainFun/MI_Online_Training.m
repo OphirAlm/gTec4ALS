@@ -208,7 +208,12 @@ for trial = 1 : numTrials * nClass % Number of trials times number of classes
         MIFeatures(chunk_i, :) = Proccessing.ExtractFeatures(MIData, Hz, bands, restingStateBands);
         
         % Predict using the pre-trained model
-        prediction = model.predict(MIFeatures(chunk_i, :));
+        [prediction, scores] = predict(model, MIFeatures(chunk_i, :));
+        
+        % If the model is not sure, mark as idle.
+        if max(scores) < 1 / numClass + 0.03
+            prediction = 1;
+        end
         
         % Saving the indexes of the trials that were classiffied correctly
         if prediction == currentTrial
@@ -254,6 +259,7 @@ EEG(:,:,chunk_i:end)           = [];
 labels(chunk_i:end)            = [];
 trials2remove(chunk_i:end)     = [];
 correctLabeled(chunk_i:end)    = [];
+
 
 %% End of recording session
 ShowCursor;
