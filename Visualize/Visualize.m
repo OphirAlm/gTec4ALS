@@ -1,12 +1,43 @@
 close all; clear; clc;
-
+%% setting single record
 recordingFolder = uigetdir('C:/Subjects/', ...
     'Choose Desired Directory');
 load(strcat(recordingFolder,'\EEG.mat'), 'EEG')
 load(strcat(recordingFolder,'\trainingVec.mat'), 'trainingVec')
+
+%% setting multiple record
+% recordingFolder = uigetdir('C:/Subjects/', ...
+%     'Choose Desired Directory');
+% 
+% %Initiallize
+% EEG = [];
+% trainingVec = [];
+% 
+% %Subject's main folder
+% folders = dir([recordingFolder]);
+% pathSplit = regexp(recordingFolder,filesep,'split');
+% mainPath = fullfile(pathSplit(1), pathSplit(2), pathSplit(3));
+% mainPath = mainPath{1};
+% 
+% %Remove . & ..
+% folders([1, 2], :) = [];
+% 
+% N_folders = size(folders, 1);
+% 
+% for dir_i = 1 : N_folders
+%     %Enter specifics folder
+%     curFolder = [mainPath, '\', folders(dir_i).name];
+%     %Load files
+%     TEMP_EEG = load(strcat(curFolder, '\EEG.mat'));
+%     TEMP_trainingVec = load(strcat(curFolder, '\trainingVec.mat'));
+%     %Stack files
+%     EEG = cat(3,EEG, TEMP_EEG.EEG);
+%     trainingVec = [trainingVec, TEMP_trainingVec.trainingVec];
+% end
+
+%%
 data = EEG;
 data = permute(data, [3, 2, 1]);
-
 idle_idx = trainingVec == 1;
 right_idx = trainingVec == 2;
 left_idx = trainingVec == 3;
