@@ -27,10 +27,6 @@ ResDelaySz    = num2str(ResSzCalc);
 set_param(ChunkDelayobj,'siz',ChunkSz);   % Set Delay size
 set_param(RestDelayobj,'siz',ResDelaySz); % Set resting Delay size
 
-%%% necessary for anything??? %%%
-% S.fh.Visible = 'off';
-%%% Question for myself %%%
-
 % Resume running program
 uiresume(S.fh);
 end

@@ -1,5 +1,9 @@
-function getSig_offline(session_runtime)
+function startSimulation_offline(session_runtime)
 % Runs the Simulink offline model
+%
+% INPUT:
+%     - session_runtime - Scalar indicating finite runtime length
+
 
 modelName = 'USBamp_offline';
 

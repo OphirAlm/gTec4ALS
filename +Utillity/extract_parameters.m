@@ -1,37 +1,50 @@
-function [Hz, chunckSz, nClass, subID, numTrials, RS_len, accumilationFlag]...
-    = extract_parameters(S, system)
-% This function extract User's defined parameters
+function [Hz, trialLength, nClass, subID, numTrials, RS_len, accumilationFlag]...
+    = extract_parameters(GUI, system)
+% EXTRACT_PARAMETERS extract User's parameters' definition
+%
+% INPUT:
+%     - GUI - Gui structure
+%     - system - String of chosen system name
+%
+% OUTPUT:
+%     - Hz - Sampling rate
+%     - trialLength - Trial length
+%     - nClass - Number of classes
+%     - subID - Subject number
+%     - numTrials - Number of trials, PER CLASS
+%     - RS_len - Resting state length, in seconds
+%     - accumilationFlag - Boolean variable for model creation data
+%                          accumulation purpose
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Extract sampling rate value
-posHz       = S.Hz.Value;
-Hz          = str2double(S.Hz.String(posHz,:));
+posHz = GUI.Hz.Value;
+Hz    = str2double(GUI.Hz.String(posHz,:));
 
 % Extract Delay Line size (in sec)
-chunckSz    = str2double(S.ChunkSz.String);
+trialLength = str2double(GUI.ChunkSz.String);
 
 % Extract number of calsses
-nClass      = str2double(S.nCls.String);
+nClass = str2double(GUI.nCls.String);
 
 % Extract subject ID number
-subID       = str2double(S.subID.String);
+subID = str2double(GUI.subID.String);
 
-% For non-Communication systems
+% Number of trials is important for non-Communication systems
 if ~strcmpi(system, 'Communication')
-    % Extract number of trials
-    numTrials   = str2double(S.nTrial.String);
+    numTrials = str2double(GUI.nTrial.String);
 else
-    % Otherwise, not important
     numTrials = [];
 end
 
-% Extract Resting state Delay Line size (in sec)
-RS_len      = str2double(S.RSlength.String);
+% Extract resting state delay Line size (in sec)
+RS_len = str2double(GUI.RSlength.String);
 
-% Extract whether to accumulate or not if online
+% Accumulation is important for Online system only
 if strcmpi(system, 'Online')
-    accumilationFlag = S.accumbx.Value;
+    accumilationFlag = GUI.accumbx.Value;
 else
-    % Otherwise, not important
     accumilationFlag = [];
 end
 end

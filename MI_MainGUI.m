@@ -5,10 +5,11 @@ close all; clear; clc;
  system = Utillity.main_gui();
 
 %% Choose file to run according to decision
-if strcmpi(system,'Offline')
-    MainFun.MI_Offline_Training
-elseif strcmpi(system,'Online')
-    MainFun.MI_Online_Training
-elseif strcmpi(system,'Communication')
-    MainFun.MI_Online_Communicate
+switch system
+    case 'Offline'
+        MainFun.MI_Offline_Training
+    case 'Online'
+        MainFun.MI_Online_Training
+    case 'Communication'
+        MainFun.MI_Online_Communicate
 end

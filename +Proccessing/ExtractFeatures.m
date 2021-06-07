@@ -1,14 +1,17 @@
 function [MIFeatures, f] = ExtractFeatures(MIData, Hz, bands, restingStateBands)
 % Extract feauters from the segmented EEG data.
 %
-% MIFeatures - Matrix of the features per trial (trials in rows features in
-% columns)
+% INPUT:
+%     - MIData - Segmented EEG signal (trials in rows, sampels in columns)
+%     - Hz - Signal sampling rate
+%     - bands - The power bands to extract features from.
+%     - restingStateBands - Resting state power recorded per band
 %
-% MIData - Segmented EEG signal (trials in rows, sampels in columns)
-% Hz - Signal sampling rate
-% bands - The power bands to extract features from.
-% restingStateBands - Resting state power recorded per band
-%
+% OUTPUT:
+%     - MIFeatures - Matrix of the features per trial (trials in rows 
+%                    features in columns)
+%     - f - Total frequency range
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Total frequency range
@@ -88,9 +91,7 @@ for channel = 1:numChans
     MIFeaturesLabel(channel, n, :) = -sum(prob_f .* log2(prob_f),2);
 end
 
-% Reshape into 2-D matrix
-% MIFeatures2 = reshape(MIFeaturesLabel,trials_N ,numChans * (bands_N * 8 + 4));
-
+%%%%%% Clean reshape and organization %%%%%%
 MIFeatures = [];
 for elec_i = 1 : numChans
     if trials_N == 1

@@ -1,14 +1,31 @@
 %% Offline MI Training
-function [recordingFolder,subID, EEG, trainingVec, RestingSignal, ...
+function [recordingFolder,subID, EEG, trainingVec, restingSignal, ...
     Hz, trialLength] = OfflineTraining
-% Runs an offline training session.
+% OFFLINETRAINING Runs an offline training session.
+% Uses parameters from parameter file and parameter selection gui.
+%
+% OUTPUT:
+%     - recordingFolder - a fullfile path of the recorded data and other
+%                         parameters
+%     - subID - subject number (scalar)
+%     - EEG - 3-D array of raw EEG signal recorded (electrodes, signal,
+%             trial)
+%     - trainingVec - a vector of scalars indicating the label of the class
+%                     presented in each trial (i.e., trainingVec length
+%                     equals to EEG 3rd dimension's length)
+%     - restingSignal - 2-D array of raw EEG signal from a pre-train
+%                       resting session. Length decided by use (default -
+%                       60 seconds)
+%     - Hz - sampling rate
+%     - trialLength - length of eacch trail (in seconds)
+
 %% Set params and setup psychtoolbox & Simulink
 % define objects' strings for Simulink objects
 USBobj          = 'USBamp_offline';
-AMPobj          = 'USBamp_offline/g.USBamp UB-2016.03.01';
-IMPobj          = 'USBamp_offline/Impedance Check';
-RestDelayobj    = 'USBamp_offline/Resting Delay';
-ChunkDelayobj   = 'USBamp_offline/Chunk Delay';
+AMPobj          = [USBobj '/g.USBamp UB-2016.03.01'];
+IMPobj          = [USBobj '/Impedance Check'];
+RestDelayobj    = [USBobj '/Resting Delay'];
+ChunkDelayobj   = [USBobj '/Chunk Delay'];
 
 % open Simulink
 open_system(['Utillity/' USBobj])
@@ -19,7 +36,7 @@ set_param(USBobj,'BlockReduction', 'off')
     = Utillity.parameter_gui(ChunkDelayobj, AMPobj, IMPobj, RestDelayobj, 'Offline');
 
 %Start simulation
-Utillity.getSig_offline(inf);
+Utillity.startSimulation_offline(inf);
 
 %Get the running time object (buffer)
 rto = get_param(ChunkDelayobj,'RuntimeObject');
@@ -70,9 +87,9 @@ DrawFormattedText(window, strcat(['Just rest for now. \n' 'The training will beg
 Screen('Flip', window);
 pause(10) % Letting the signal to get stable
 pause(restingTime)
-RestingSignal =  restingStateDelay.OutputPort(1).Data';
+restingSignal =  restingStateDelay.OutputPort(1).Data';
 % Cut and clean the signalas needed
-[RestingSignal, ~] = Proccessing.Preprocess(RestingSignal);
+[restingSignal, ~] = Proccessing.Preprocess(restingSignal);
 
 % Show a message the declares that training is about to begin
 DrawFormattedText(window, strcat('The training will begin in few seconds.'), 'center','center', white);

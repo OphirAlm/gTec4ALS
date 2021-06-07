@@ -3,12 +3,15 @@ function [MIData, removeTrial] = Preprocess(raw_EEG, maxAmp)
 % Cleans the signal using laplace, arrange relevant electrodes and return
 % the wanted EEG signal.
 %
-% MIData - Segmented EEG signal (trials in rows, sampels in columns)
-% removeTrial - Vector of trials to remove (Noise\ Artifacts).
-% maxAmp - The amplitude which above or below (Negative) the trial will be
-% classiffied as noisy (Defaults 150 micro-V).
-% raw_EEG - Raw signal as recieved from the g.tec recorde.
+% INPUT:
+%     - raw_EEG - Raw signal as recieved from the g.tec record.
+%     - maxAmp - The amplitude which above or below (Negative) the trial 
+%                will be classiffied as noisy (Defaults 150 micro-V).
 %
+% OUTPUT:
+%     - MIData - Segmented EEG signal (trials in rows, sampels in columns)
+%     - removeTrial - Vector of trials to remove (Noise\ Artifacts).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Set defualt maxAmp value

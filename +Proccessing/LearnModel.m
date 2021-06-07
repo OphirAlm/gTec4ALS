@@ -2,15 +2,17 @@ function [model, validationAccuracy]...
     = LearnModel(MIFeatures, targetLabels, trials2remove, recordingFolder)
 % Train ML Model according to the extracted features.
 %
-% model - ML Object.
-% validationAccuracy - Cross validation mean accuracy of the model.
+% INPUT:
+%     - MIFeatures - Matrix of the features per trial (trials in rows 
+%                    features in columns)
+%     - targetLabels - Vector of labels per trial.
+%     - trials2remove - Vector of trials to remove (Noise\ Artifacts).
+%     - recordingFolder - Folder to save in the new model.
 %
-% MIFeatures - Matrix of the features per trial (trials in rows features in
-% columns)
-%targetLAbels - Vector of labels per trial.
-% trials2remove - Vector of trials to remove (Noise\ Artifacts).
-% recordingFolder - Folder to save in the new model.
-%
+% OUTPUT:
+%     - model - ML Object.
+%     - validationAccuracy - Cross validation mean accuracy of the model.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Read Features & Labels
