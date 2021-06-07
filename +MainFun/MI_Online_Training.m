@@ -211,7 +211,7 @@ for trial = 1 : numTrials * nClass % Number of trials times number of classes
         [prediction, scores] = predict(model, MIFeatures(chunk_i, :));
         
         % If the model is not sure, mark as idle.
-        if max(scores) < 1 / numClass + 0.03
+        if max(scores) < 1 / nClass + 0.03
             prediction = 1;
         end
         
