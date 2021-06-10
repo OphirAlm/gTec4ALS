@@ -53,7 +53,17 @@ load(strcat(fullPath,'\FeatureParam.mat'), 'bands','f')
 % % %     'number of chosen classes and number of model classes are uneven!');
 
 %% Display Setup
-figure('units','normalized','outerPosition',[1 0 1 1]);
+
+% Checking monitor position and number of monitors
+monitorPos = get(0,'MonitorPositions');
+monitorN = size(monitorPos, 1);
+% Which monitor to use TODO: make a parameter
+choosenMonitor = 2;
+% Get choosen monitor position
+figurePos = monitorPos(choosenMonitor, :);
+
+% Open full screen monitor
+figure('outerPosition',figurePos);
 
 % get the figure and axes handles
 MainFig = gcf;
@@ -68,6 +78,7 @@ set(MainFig,'NumberTitle','off');
 % Set background color
 set(hAx,'color', 'black');
 
+% Display rest message
 hText = text(0.5,0.5 ,...
     ['Just rest for now.' sprintf('\n') 'The Communication Program will begin soon.'], ...
     'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
