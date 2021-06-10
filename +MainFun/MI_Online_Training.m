@@ -39,6 +39,11 @@ monitorPos = get(0,'MonitorPositions');
 monitorN = size(monitorPos, 1);
 % Which monitor to use TODO: make a parameter
 choosenMonitor = 2;
+% If no 2nd monitor found, use the main monitor
+if choosenMonitor < monitorN
+    choosenMonitor = 1;
+    disp('Another monitored is not detected, using main monitor')
+end
 % Get choosen monitor position
 figurePos = monitorPos(choosenMonitor, :);
 
@@ -68,7 +73,7 @@ hold on
 Classes = 1 : nClass;
 
 % Load photos
-[Arrow, Idle, Mark] = Utillity.load_photos();
+[Arrow, Idle, ~] = Utillity.load_photos();
 
 %% Parmeters
 cueLength       = 2;     % Cue length in seconds
@@ -166,7 +171,7 @@ for trial = 1 : numTrials * nClass % Number of trials times number of classes
     cla
 
     % Ready
-    hText = text(0.5,0.5 , 'Ready',...
+    text(0.5,0.5 , 'Ready',...
         'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
     % Pause for ready length
     pause(readyLength);
@@ -264,14 +269,12 @@ correctLabeled(chunk_i:end)    = [];
 
 
 %% End of recording session
-ShowCursor;
-sca;
-Priority(0);
-Screen('close')
 
 %Stop simulink
 set_param(gcs, 'SimulationCommand', 'stop')
 
+% Close figure
+close(MainFig)
 %% Train new model
 disp('Training new model, please wait')
 

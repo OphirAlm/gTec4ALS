@@ -42,120 +42,152 @@ Utillity.startSimulation(inf, USBobj);
 rto = get_param(ChunkDelayobj,'RuntimeObject');
 restingStateDelay = get_param(RestDelayobj,'RuntimeObject');
 
-% % % subID = input('Please enter subject ID: ');     % prompt to enter subject ID
 %Get Date and time for the model
 date = string(datetime);
 date = date(1 : end - 3);
 date = strrep(date,':','-');
 
+% Create vector of each class
 Classes = 1 : numClass;
-numClass = length(Classes);
+% Make directory of the current session
 recordingFolder = strcat('C:\Subjects\Sub',num2str(subID),'\offline- ',date,'\');   %%% Change the path if needed %%%
 mkdir(recordingFolder);
-idleSign = imread('./LoadingPics/idleSign.jpg');              % (1) load idle sign
-rightArrow = imread('./LoadingPics/RightArrow.jpg');          % (2) load right arrow image
-leftArrow = imread('./LoadingPics/LeftArrow.jpg');            % (3) load left arrow image
-downArrow = imread('./LoadingPics/downArrow.jpg');            % (4) load down arrow image
 
-nbchan = 16;                                    % number of channels
+% Load photos
+trainingImage{1} = imread('./LoadingPics/idleSign.jpg');              % (1) load idle sign
+trainingImage{2} = imread('./LoadingPics/RightArrow.jpg');          % (2) load right arrow image
+trainingImage{3} = imread('./LoadingPics/LeftArrow.jpg');            % (3) load left arrow image
+trainingImage{4} = imread('./LoadingPics/downArrow.jpg');            % (4) load down arrow image
+
+% number of channels
+nbchan = 16;        
+% Cue length in seconds
 cueLength = 2;
-readyLength = 1;                              %%% Added cue ready and next lengths %%%
+% Ready length in seconds
+readyLength = 1;         
+% Time between trials in seconds
 nextLength = 1;
 
-EEG = zeros(nbchan, trialLength*Hz, numClass*numTrials);
+% Allocate Signal matrix
+EEG = zeros(nbchan, trialLength*Hz, numClass*numTrials);  
 
-% Define the keyboard keys that are listened for:
-KbName('UnifyKeyNames');
-% let psychtoolbox know what the escape key is
-escapeKey = KbName('Escape');                  
+%% Display Setup
+% Checking monitor position and number of monitors
+monitorPos = get(0,'MonitorPositions');
+monitorN = size(monitorPos, 1);
+% Which monitor to use TODO: make a parameter
+choosenMonitor = 2;
+% If no 2nd monitor found, use the main monitor
+if choosenMonitor < monitorN
+    choosenMonitor = 1;
+    disp('Another monitored is not detected, using main monitor')
+end
+% Get choosen monitor position
+figurePos = monitorPos(choosenMonitor, :);
 
+% Open full screen monitor
+figure('outerPosition',figurePos);
 
-%% Psychtoolbox, Stim, Screen Params Init:
-disp('Setting up Psychtoolbox parameters...');
-disp('This will open a black screen - good luck!');
-PsychDebugWindowConfiguration(0,1);   %%% For debugging, change 1 to 0.5 (opaquaness of the screen) %%%
-Screen('Preference', 'SkipSyncTests', 0);   %%% Change to 1 if in debugging mode %%%
-[window,white,black,screenXpixels,screenYpixels,xCenter,yCenter,ifi] = Utillity.PsychInit();
-topPriorityLevel = MaxPriority(window);
-Priority(topPriorityLevel);
+% get the figure and axes handles
+MainFig = gcf;
+hAx  = gca;
 
-
+% set the axes to full screen
+set(hAx,'Unit','normalized','Position',[0 0 1 1]);
+% hide the toolbar
+set(MainFig,'menubar','none')
+% to hide the title
+set(MainFig,'NumberTitle','off');
+% Set background color
+set(hAx,'color', 'black');
+% Lock axes limits
+hAx.XLim = [0, 1];
+hAx.YLim = [0, 1];
+hold on
 
 %% Record Resteing State Stage
-DrawFormattedText(window, strcat(['Just rest for now. \n' 'The training will begin soon.']), 'center','center', white);
-Screen('Flip', window);
-pause(10) % Letting the signal to get stable
-pause(restingTime)
-restingSignal =  restingStateDelay.OutputPort(1).Data';
-% Cut and clean the signalas needed
-[restingSignal, ~] = Proccessing.Preprocess(restingSignal);
+% Display rest message
+text(0.5,0.5 ,...
+    ['Just rest for now.' sprintf('\n') 'The training session will begin soon.'], ...
+    'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
 
-% Show a message the declares that training is about to begin
-DrawFormattedText(window, strcat('The training will begin in few seconds.'), 'center','center', white);
-Screen('Flip', window);
+% Letting the signal time to stabalize
+pause(10)
+% Pause for the resting state time
+pause(restingTime)
+
+% Extract resting state signal and preprocess it
+RestingSignal       = restingStateDelay.OutputPort(1).Data';
+[RestingMI, ~]      = Proccessing.Preprocess(RestingSignal);
+restingStateBands   = EEGFun.restingState(RestingMI, bands, Hz);
+
+% Clear axis
+cla
+
+% Show a message that declares that training is about to begin
+text(0.5,0.5 ,...
+    'The training session will begin in few seconds.', ...
+    'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
 pause(3)
+% Clear axis
+cla
 
 %% Record Training Stage
 % prepare set of training trials with predefined arrow cues
 trainingVec = Utillity.prepareTraining(numTrials,Classes);  %% Changed the function to be equal trials per condition %%%
-pause(0.2);
 
 % for each trial:
-for trial_i = 1:numTrials * numClass %%% Trials times number of classes %%%
+for trial_i = 1:numTrials * numClass
     
-    
-    % Check Keyboard press
-    [keyIsDown,secs, keyCode] = KbCheck;    % check for keyboard press
-    if keyCode(escapeKey)                   % pushed escape key - SHUT IT DOWN!!!
-        ShowCursor;
-        sca;
-        return
-    end
-    
+    % Current trial label
     currentTrial = trainingVec(trial_i);
-    if currentTrial == 1
-        imageTexture = Screen('MakeTexture', window, idleSign);
-    elseif currentTrial == 2
-        imageTexture = Screen('MakeTexture', window, rightArrow);
-    elseif currentTrial == 3
-        imageTexture = Screen('MakeTexture',window, leftArrow);
-    elseif currentTrial == 4
-        imageTexture = Screen('MakeTexture',window, downArrow);
-        
-    end
-    
-    %%% Added cue before ready %%%
-    Screen('DrawTexture', window, imageTexture, [], [], 0);
-    Screen('Flip', window);
+            
+    % Cue before ready
+    image(flip(trainingImage{currentTrial}, 1), 'XData', [0.25, 0.75],...
+        'YData', [0.25, 0.75 * ...
+        size(trainingImage{currentTrial},1)./ size(trainingImage{currentTrial},2)])
+    % Pause for cue length
     pause(cueLength);
-    
-    
-    % Show on screen the corresponding arrow for entire trial for 5 seconds
-    % Arrow Cue
-    Screen('TextSize', window, 50);                         % Draw text in the bottom portion of the screen in white
-    DrawFormattedText(window, 'Ready', 'center',screenYpixels * 0.75, white);
-    Screen('Flip', window);
-    pause(readyLength);         % used to be 2 seconds
+    % Clear axis
+    cla
     
     
     
-    DrawFormattedText(window, strcat('Trial #',num2str(trial_i),' from:',num2str(numTrials * numClass)), 'center',screenYpixels * 0.98, white);
-    Screen('DrawTexture', window, imageTexture, [], [], 0);
-    Screen('Flip', window);
+    % Ready
+    text(0.5,0.5 , 'Ready',...
+        'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
+    % Pause for ready length
+    pause(readyLength);
+    % Clear axis
+    cla
+    
+    
+    % Show image of the corresponding label of the trial
+    image(flip(trainingImage{currentTrial}, 1), 'XData', [0.25, 0.75],...
+        'YData', [0.25, 0.75 * ...
+        size(trainingImage{currentTrial},1)./ size(trainingImage{currentTrial},2)])    % Pause for trial length
     pause(trialLength)
+    % Clear axis
+    cla
+    
+    % Get raw signal of the trial
     EEG(:, :, trial_i) = rto.OutputPort(1).Data';
     
-    Screen('TextSize', window, 70);  % Draw text in the bottom portion of the screen in white
-    DrawFormattedText(window, 'Next', 'center',screenYpixels * 0.75, white);
-    Screen('Flip', window);
-    pause(nextLength);               % "Next" stays on screen
-    
+    % Display "Next" trial text
+    text(0.5,0.5 , 'Next',...
+        'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
+    % Display trial count
+    text(0.5,0.2 , strcat('Trial #',num2str(trial_i + 1),' Out Of : '...
+        ,num2str(numTrials * nClass)),...
+        'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
+    % Wait for next trial
+    pause(nextLength);
+    % Clear axis
+    cla
 end
 
 %% End of recording session
-ShowCursor;
-sca;
-Priority(0);
+% Save relevant time in the session directory
 save(strcat(recordingFolder,'trainingVec.mat'),'trainingVec');
 save([recordingFolder, 'EEG'], 'EEG')
 save([recordingFolder, 'RestingSignal'], 'RestingSignal')
@@ -163,5 +195,6 @@ save([recordingFolder, 'parameters'], 'Hz', 'trialLength')
 
 % Stop simulink
 set_param(gcs, 'SimulationCommand', 'stop')
-% Close PsychToolBox
-Screen('close')
+
+% Close figure
+close(MainFig)
