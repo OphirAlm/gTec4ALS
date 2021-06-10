@@ -1,17 +1,16 @@
-%% Online Communication Function
 function MI_Online_Communicate()
 % MI_ONLINE_COMMUNICATE Activates online Simulink object, w/o training.
-% Communication handled with keyboard. Four class is necessary for
-% communication.
+%   Communication handled with keyboard. Four class is necessary for
+%   communication.
 %
-% For now, only sideways movement possible (move through lines from the
-% sides - right goes down, left goes up).
+%   For now, only sideways movement possible (move through lines from the
+%   sides - right goes down, left goes up).
 %
-% Class movements:
-%     - Right MI - Right movement.
-%     - Left MI - Left movements.
-%     - Leg MI - Decision.
-%     - Idle - Stay put.
+%   Class movements:
+%         - Right MI - Right movement.
+%        - Left MI - Left movements.
+%         - Leg MI - Decision.
+%        - Idle - Stay put.
 %
 %% Set params and setup psychtoolbox & Simulink
 
