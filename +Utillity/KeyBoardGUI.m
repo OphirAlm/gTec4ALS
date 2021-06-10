@@ -1,6 +1,13 @@
 function KeyBoardGUI(state, handle, text_str)
-% Loading the screen that suit the current state, and draw a red rectangle
+% KEYBOARDGUI Loads screen that suits the current state, and draws a red rectangle
 % in the current state location.
+%
+% INPUT:
+%     - state - Structure with two fields:
+%         - position - 1-Hot vector
+%         - screen - The name of the current screen to present
+%     - handle - Communcation figure handle
+%     - text_str - Accumulating string text
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

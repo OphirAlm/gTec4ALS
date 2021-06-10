@@ -1,5 +1,12 @@
 function [Arrow, Idle, Mark] = load_photos()
-% Loading the photos for the online Training phase
+% LOAD_PHOTOS Loads the photos for the online training phase
+%
+% OUTPUT:
+%     - Arrow - Cell-array containing the arrow pictures names
+%     - Idle - Cell-array containing the idle-sign pictures names
+%     - Mark - The mark picture name
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 % load arrow image

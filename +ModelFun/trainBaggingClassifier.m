@@ -1,5 +1,18 @@
 function [trainedClassifier, validationAccuracy] =...
     trainBaggingClassifier(datasetTable, k, Ntrees)
+%TRAINBAGGINGCLASSIFIER Trains a ML ensemble classifier using bagging tree method.
+%
+% INPUT:
+%     - datasetTable - 
+%     - k - Scalar for K-fold validation
+%     - Ntrees - Scalar for number trees desired
+%
+% OUTPUT:
+%     - trainedClassifier - The ensemble classifier
+%     - validationAccuracy - The mean accuracy of K-fold validation
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 %Input size
 N = size(datasetTable, 2);

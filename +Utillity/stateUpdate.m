@@ -1,7 +1,20 @@
 function [newState, output] = stateUpdate(currentState, Command)
-% Getting the input command, and changes the state of the system (screen
+% STATEUPDATE Gets the input command, and changes the state of the system (screen
 % and pointer position).
-
+%
+% INPUT:
+%     - currentState - Structure with two fields:
+%         - position - 1-Hot vector
+%         - screen - The name of the current screen to present
+%     - Command - The prediction of the system, which decides next move.
+%
+% OUTPUT:
+%     - newState - Updated structure with two fields:
+%         - position - 1-Hot vector
+%         - screen - The name of the current screen to present
+%     - output - Chosen key
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Default Output is None.
 output = 0;

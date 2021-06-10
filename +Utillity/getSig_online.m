@@ -1,6 +1,10 @@
 function getSig_online(session_runtime)
 % Runs the simulink online model
 
+
+
+
+%%
 modelName = 'USBamp_online';
 
 if isempty(find_system('Type','block_diagram','Name',modelName))

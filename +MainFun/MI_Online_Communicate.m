@@ -1,13 +1,26 @@
-%% Online Communication script
-
+%% Online Communication Function
+function MI_Online_Communicate()
+% MI_ONLINE_COMMUNICATE Activates online Simulink object, w/o training.
+% Communication handled with keyboard. Four class is necessary for
+% communication.
+%
+% For now, only sideways movement possible (move through lines from the
+% sides - right goes down, left goes up).
+%
+% Class movements:
+%     - Right MI - Right movement.
+%     - Left MI - Left movements.
+%     - Leg MI - Decision.
+%     - Idle - Stay put.
+%
 %% Set params and setup psychtoolbox & Simulink
 
 % Define objects' strings for Simulink objects
 USBobj          = 'USBamp_online';
-AMPobj          = 'USBamp_online/g.USBamp UB-2016.03.01';
-IMPobj          = 'USBamp_online/Impedance Check';
-RestDelayobj    = 'USBamp_online/Resting Delay';
-ChunkDelayobj   = 'USBamp_online/Chunk Delay';
+AMPobj          = [USBobj '/g.USBamp UB-2016.03.01'];
+IMPobj          = [USBobj '/Impedance Check'];
+RestDelayobj    = [USBobj '/Resting Delay'];
+ChunkDelayobj   = [USBobj '/Chunk Delay'];
 
 % open Simulink
 open_system(['Utillity/' USBobj])
@@ -18,7 +31,7 @@ set_param(USBobj,'BlockReduction', 'off')
     = Utillity.parameter_gui(ChunkDelayobj, AMPobj, IMPobj, RestDelayobj, 'Communication');
 
 % Start simulation
-Utillity.getSig_online(inf);
+Utillity.startSimulation(inf, USBobj);
 
 % Get the running time object (Delay line)
 restingStateDelay  = get_param(RestDelayobj,'RuntimeObject');
@@ -195,3 +208,4 @@ end
 
 %Stop simulink
 set_param(gcs, 'SimulationCommand', 'stop')
+end

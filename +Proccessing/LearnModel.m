@@ -1,6 +1,6 @@
 function [model, validationAccuracy]...
     = LearnModel(MIFeatures, targetLabels, trials2remove, recordingFolder)
-% Train ML Model according to the extracted features.
+% LEARNMODEL Trains ML Model according to the extracted features.
 %
 % INPUT:
 %     - MIFeatures - Matrix of the features per trial (trials in rows 
@@ -20,7 +20,7 @@ trials2remove = logical(trials2remove);
 k = 10;
 trees_N = 300;
 
-%Removing bad trials
+% Removing bad trials
 MIFeatures(trials2remove, :) = [];
 targetLabels(trials2remove) = [];
 

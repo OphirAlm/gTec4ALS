@@ -1,11 +1,10 @@
-function startSimulation_offline(session_runtime)
+function startSimulation(session_runtime, modelName)
 % Runs the Simulink offline model
 %
 % INPUT:
 %     - session_runtime - Scalar indicating finite runtime length
-
-
-modelName = 'USBamp_offline';
+%     - modelName - Simulink object(??) name
+%%
 
 if isempty(find_system('Type','block_diagram','Name',modelName))
     load_system(modelName);

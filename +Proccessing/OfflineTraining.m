@@ -36,7 +36,7 @@ set_param(USBobj,'BlockReduction', 'off')
     = Utillity.parameter_gui(ChunkDelayobj, AMPobj, IMPobj, RestDelayobj, 'Offline');
 
 %Start simulation
-Utillity.startSimulation_offline(inf);
+Utillity.startSimulation(inf, USBobj);
 
 %Get the running time object (buffer)
 rto = get_param(ChunkDelayobj,'RuntimeObject');
@@ -63,7 +63,6 @@ readyLength = 1;                              %%% Added cue ready and next lengt
 nextLength = 1;
 
 EEG = zeros(nbchan, trialLength*Hz, numClass*numTrials);
-
 
 % Define the keyboard keys that are listened for:
 KbName('UnifyKeyNames');

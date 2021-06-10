@@ -1,6 +1,14 @@
 %% Offline Training Model Main Script
-
-%% Band 
+function MI_Offline_Training()
+% MI_OFFLINE_TRAINING performs a simulation and data recording. Cleans the data,
+% preprocesses it. Feature extracted, including attached parameters. A model is being
+% trained over extracted features, and mean validation accuracy is printed.
+%
+% All data is being saved along the script in designated folder created by
+% the script. Folder's final name consists of date (including hours and
+% minutes), and mean validation accuracy.
+%
+%% Band
 
 % frequency bands features
 bands{1} = [9, 13];
@@ -15,7 +23,7 @@ bands{9} = [32, 36];
 bands{10} = [35, 40];
 
 %% Run stimulation and record EEG data
-[recordingFolder,subID, EEG, trainingVec, RestingSignal, Hz, trialLength] = ...
+[recordingFolder, ~, EEG, trainingVec, RestingSignal, Hz, ~] = ...
     Proccessing.OfflineTraining;
 
 % End of Phase message
@@ -40,7 +48,7 @@ save(strcat(recordingFolder,'\FeatureParam.mat'),'bands', 'f');
 % End of Phase message
 disp('Finished extracting features.');
 
-%% Train a model 
+%% Train a model
 [model, validationAccuracy]...
     = Proccessing.LearnModel(MIFeatures, trainingVec, trials2remove, recordingFolder);
 
@@ -53,3 +61,4 @@ save(strcat(recordingFolder,'\RF_model.mat'), 'model')
 
 % End of Phase message
 disp('Finished training the model.');
+end

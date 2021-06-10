@@ -1,5 +1,5 @@
 function Impedance_call(varargin)
-% Callback for checkboxes.
+% Callback for impedance pushbutton.
 
 % Extract Impedance object string
 IMPobj = varargin{1,end};

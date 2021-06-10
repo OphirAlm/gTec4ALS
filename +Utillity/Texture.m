@@ -1,5 +1,5 @@
 function [ArrowTexture, IdleTexture, MarkTexture] = Texture(window, Arrow, Idle, Mark)
-% Creates Texture for the PsychToolBox online training phase.
+% TEXTURE Creates texture for the PsychToolBox online training phase.
 
 
 ArrowTexture(1) = Screen('MakeTexture', window, Arrow{1});

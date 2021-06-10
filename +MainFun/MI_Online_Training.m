@@ -1,24 +1,29 @@
-%% Online Training Script
-
+%% Online Training Function
+function MI_Online_Training()
+% MI_ONLINE_TRAINING Uses previous ML classification model and runs a
+% simulation which includes a feedback for the user. At the end of the
+% simulation, the function creates a new model consisting of only the new
+% data or the combined new and old data, to the user's choice.
+%
 %% Set params and setup psychtoolbox & Simulink
 
 % Define objects' strings for Simulink objects
 USBobj          = 'USBamp_online';
-AMPobj          = 'USBamp_online/g.USBamp UB-2016.03.01';
-IMPobj          = 'USBamp_online/Impedance Check';
-RestDelayobj    = 'USBamp_online/Resting Delay';
-ChunkDelayobj   = 'USBamp_online/Chunk Delay';
+AMPobj          = [USBobj '/g.USBamp UB-2016.03.01'];
+IMPobj          = [USBobj '/Impedance Check'];
+RestDelayobj    = [USBobj '/Resting Delay'];
+ChunkDelayobj   = [USBobj '/Chunk Delay'];
 
-% open Simulink
+% Open Simulink
 open_system(['Utillity/' USBobj])
 set_param(USBobj,'BlockReduction', 'off')
 
 % Activate parameter gui
-[Hz, trialLength, nClass, subID, numTrials, restingTime, accumilationFlag] ...
+[Hz, trialLength, nClass, subID, numTrials, restingTime, accumulationFlag] ...
     = Utillity.parameter_gui(ChunkDelayobj, AMPobj, IMPobj, RestDelayobj, 'Online');
 
 % Start simulation
-Utillity.getSig_online(inf);
+Utillity.startSimulation(inf, USBobj);
 
 % Get the running time object (Delay line)
 restingStateDelay  = get_param(RestDelayobj,'RuntimeObject');
@@ -70,7 +75,7 @@ targetLine = 20;
 % They fit, need to set resolution at beggining
 middleRect  = [xCenter - 250, 35, xCenter + 250, 535];
 rightRect   = [xCenter + gap + 300, 150, xCenter + 900 + gap , 450];
-leftRect    = [ xCenter - 900 - gap, 150, xCenter - gap - 300 , 450];
+leftRect    = [xCenter - 900 - gap, 150, xCenter - gap - 300 , 450];
 downRect    = [xCenter - 250, 600 + gap, xCenter + 250, 1000 + gap];
 
 targetRect(1, :) = [middleRect(1:2) - targetLine, middleRect(3:4) + targetLine];
@@ -107,9 +112,9 @@ if exist(strcat(fullPath,'\MIAccumilate.mat'), 'file')
     % Accumilating trials to remove
     prevAccumilateRemove   = load(strcat(fullPath,'\removeAccumilate.mat'));
     prevAccumilateRemove   = prevAccumilateRemove.removeAccumilate;
-elseif accumilationFlag
-    disp('No accumilating model in the folder, predicting with normal model.')
-    accumilationFlag = 0;
+elseif accumulationFlag
+    disp('No accumulating model in the folder, predicting with normal model.')
+    accumulationFlag = 0;
 end
 
 % Load features' parameters
@@ -283,7 +288,7 @@ recordingFolder = strcat('C:\Subjects\Sub',num2str(subID),'\online -',date,'\');
 mkdir(recordingFolder);
 
 %% Accumilate the current correct trials to the previous trials
-if accumilationFlag
+if accumulationFlag
     correctLabeled = logical(correctLabeled);
     % Extract correct trials' labels and trials to remove from correct trials
     removeCorrect   = trials2remove(correctLabeled);
@@ -318,7 +323,7 @@ save([recordingFolder, 'accumilateLabels'], 'accumilateLabels')
 
 %% Train model
 
-if ~accumilationFlag
+if ~accumulationFlag
     %Train new model
     [trainedClassifier, validationAccuracy]...
         = Proccessing.LearnModel(MIFeatures, labels, trials2remove, recordingFolder);
@@ -334,3 +339,4 @@ movefile(recordingFolder, newDirName)
 % Print how many trials were correctly classifiied (3/3)
 disp([num2str(correct_trials) ' out of ' num2str(numTrials * nClass) '(' ...
     num2str(100 * correct_trials / (numTrials * nClass)) '%)'])
+end
