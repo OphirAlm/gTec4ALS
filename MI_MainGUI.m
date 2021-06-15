@@ -16,7 +16,7 @@
 %          Choose button with Leg MI.
 %          No-Decision option for precision purposes.
 %          Send button for Text-To-Speach.
-%          Lock option to prevent gibberish when speach is unwanted.
+%          Lock option to prevent gibberish when speech is unwanted.
 % 
 % Hardware:
 %     - g.tec USBamp, 16 electrodes
@@ -24,6 +24,10 @@
 % System requirements:
 %     - MATLAB R2015a
 %     - Windows 7 pro
+%     - g.needAccess
+%     - g.recorder dongle
+%     - g.HISYS 
+%     - g.USBamp driver
 %
 %% Motor Imagery Main GUI
 close all; clear; clc;
