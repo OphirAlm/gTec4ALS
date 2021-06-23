@@ -273,8 +273,6 @@ correctLabeled(chunk_i:end)    = [];
 %Stop simulink
 set_param(gcs, 'SimulationCommand', 'stop')
 
-% Close figure
-close(MainFig)
 %% Train new model
 disp('Training new model, please wait')
 
@@ -323,6 +321,11 @@ save([recordingFolder, 'accumilateLabels'], 'accumilateLabels')
 
 %% Train model
 
+% Display messsage on screen
+cla
+text(0.5,0.5 , 'Training new model, please wait.',...
+    'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
+
 if ~accumulationFlag
     %Train new model
     [trainedClassifier, validationAccuracy]...
@@ -339,4 +342,20 @@ movefile(recordingFolder, newDirName)
 % Print how many trials were correctly classifiied (3/3)
 disp([num2str(correct_trials) ' out of ' num2str(numTrials * nClass) '(' ...
     num2str(100 * correct_trials / (numTrials * nClass)) '%)'])
+
+% Display accuracy messsage on screen
+cla
+text(0.5,0.5 , [ 'New Model Accuracy - ' num2str(validationAccuracy*100),'%'...
+    sprintf('\n') 'Current Session (Previous Model) Preformance - ' ...
+    num2str(correct_trials) ' Out Of ' num2str(numTrials * nClass)...
+    '('  num2str(100 * correct_trials /(numTrials * nClass)) '%)'],...
+    'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
+
+% Wait for button press
+text(0.5,0.2 , 'Press Any Key To Close Program',...
+    'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
+% Wait
+waitforbuttonpress
+% Close
+close(MainFig)
 end
