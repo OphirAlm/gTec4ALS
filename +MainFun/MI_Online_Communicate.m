@@ -26,7 +26,7 @@ open_system(['Utillity/' USBobj])
 set_param(USBobj,'BlockReduction', 'off')
 
 % Activate parameter gui
-[Hz, trialLength, nClass, subID, ~, restingTime] ...
+[Hz, trialLength, ~, subID, ~, restingTime] ...
     = Utillity.parameter_gui(ChunkDelayobj, AMPobj, IMPobj, RestDelayobj, 'Communication');
 
 % Start simulation
@@ -39,8 +39,6 @@ rto                = get_param(ChunkDelayobj,'RuntimeObject');
 % Get Desired model to use (Choose folder by date)
 fullPath = uigetdir(['C:/Subjects/Sub' num2str(subID) '/'], ...
     'Choose Desired Directory');
-
-
 
 %% Load photos
 
@@ -159,7 +157,7 @@ while runFlag == 1 % Number of trials times number of classes
     pause(trialLength + 0.5)
     
     % Check Keyboard press - Escape key set for shutting down the program
-    [keyIsDown,secs, keyCode] = KbCheck;
+    [~,~, keyCode] = KbCheck;
     if keyCode(escapeKey)
         ShowCursor;
         sca;

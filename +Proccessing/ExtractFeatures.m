@@ -48,7 +48,7 @@ for channel = 1:numChans
             bandpower(squeeze(MIData(channel, :, :)),Hz,bands{band_i});
         % Extract relaitve band power to the resting state power.
         MIFeaturesLabel(channel, n + 1, :) = ...
-            MIFeaturesLabel(channel, n, :) ./ restingStateBands(channel, band_i);
+            MIFeaturesLabel(channel, n, :) ./ restingStateBands(channel, band_i, :);
         % Extract relaitve band power (relative to total power and each
         % power band)
         MIFeaturesLabel(channel, n + 2, :) = ...

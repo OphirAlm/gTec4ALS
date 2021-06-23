@@ -23,7 +23,7 @@ bands{9} = [32, 36];
 bands{10} = [35, 40];
 
 %% Run stimulation and record EEG data
-[recordingFolder, ~, EEG, trainingVec, RestingSignal, Hz, ~] = ...
+[recordingFolder, ~, EEG, trainingVec, restingStateBands, Hz, ~] = ...
     Proccessing.OfflineTraining;
 
 % End of Phase message
@@ -39,7 +39,7 @@ save(strcat(recordingFolder,'\','MIData.mat'),'MIData');
 disp('Finished pre-processing the data.');
 
 %% Extract features
-[MIFeatures, f] = Proccessing.ExtractFeatures(MIData, Hz, bands, RestingSignal);
+[MIFeatures, f] = Proccessing.ExtractFeatures(MIData, Hz, bands, restingStateBands);
 
 % Save the files
 save(strcat(recordingFolder,'\MIFeatures.mat'),'MIFeatures');

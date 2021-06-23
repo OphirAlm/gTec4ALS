@@ -1,5 +1,5 @@
 %% Offline MI Training
-function [recordingFolder,subID, EEG, trainingVec, restingSignal, ...
+function [recordingFolder,subID, EEG, trainingVec, restingStateBands, ...
     Hz, trialLength] = OfflineTraining
 % OFFLINETRAINING Runs an offline training session.
 % Uses parameters from parameter file and parameter selection gui.
@@ -60,7 +60,7 @@ trainingImage{3} = imread('./LoadingPics/LeftArrow.jpg');            % (3) load 
 trainingImage{4} = imread('./LoadingPics/downArrow.jpg');            % (4) load down arrow image
 
 % number of channels
-nbchan = 16;        
+nbChan = 16;        
 % Cue length in seconds
 cueLength = 2;
 % Ready length in seconds
@@ -68,9 +68,9 @@ readyLength = 1;
 % Time between trials in seconds
 nextLength = 1;
 
-% Allocate Signal matrix
-EEG = zeros(nbchan, trialLength*Hz, numClass*numTrials);  
-
+% Allocate Signal matrices
+EEG = zeros(nbChan, trialLength*Hz, numClass*numTrials);  
+restingStateBands = zeros(nbChan, restingTime*Hz, numClass*numTrials);
 %% Display Setup
 % Checking monitor position and number of monitors
 monitorPos = get(0,'MonitorPositions');
@@ -154,9 +154,9 @@ for trial_i = 1:numTrials * numClass
     cla
     
     % Extract resting state signal and preprocess it
-    RestingSignal       = restingStateDelay.OutputPort(1).Data';
-    [RestingMI, ~]      = Proccessing.Preprocess(RestingSignal);
-    restingStateBands   = EEGFun.restingState(RestingMI, bands, Hz);
+    RestingSignal                  = restingStateDelay.OutputPort(1).Data';
+    [RestingMI, ~]                 = Proccessing.Preprocess(RestingSignal);
+    restingStateBands(:,:,trial_i) = EEGFun.restingState(RestingMI, bands, Hz);
     
     % Ready
     text(0.5,0.5 , 'Ready',...
@@ -195,7 +195,7 @@ end
 % Save relevant time in the session directory
 save(strcat(recordingFolder,'trainingVec.mat'),'trainingVec');
 save([recordingFolder, 'EEG'], 'EEG')
-save([recordingFolder, 'RestingSignal'], 'RestingSignal')
+save([recordingFolder, 'restingStateBands'], 'restingStateBands')
 save([recordingFolder, 'parameters'], 'Hz', 'trialLength')
 
 % Stop simulink

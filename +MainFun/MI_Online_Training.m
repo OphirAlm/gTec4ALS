@@ -82,6 +82,8 @@ nextLength      = 2;     % Next length in seconds
 chunk_i         = 1;     % Initiallize chunk count
 correct_trials  = 0;     % Initiallize correct trials
 
+nbChan = 16;
+
 % Rectangle positions (order - Idle, Right, Left, Down)
 rectangePos = [0.355, 0.535, 0.285, 0.395;...
     0.665, 0.55, 0.325, 0.37;...
@@ -150,7 +152,7 @@ cla
 trainingVec = Utillity.prepareTraining(numTrials,Classes);
 
 % Allocate arraies
-EEG             = zeros(size(RestingSignal, 1), trialLength * Hz, numTrials * nClass * 3);
+EEG             = zeros(nbChan, trialLength * Hz, numTrials * nClass * 3);
 labels          = zeros(1, numTrials * nClass * 3);
 trials2remove   = zeros(size(labels));
 correctLabeled  = zeros(size(labels));
@@ -342,10 +344,10 @@ text(0.5,0.5 , 'Training new model, please wait.',...
 
 if ~accumulationFlag
     %Train new model
-    [trainedClassifier, validationAccuracy]...
+    [~, validationAccuracy]...
         = Proccessing.LearnModel(MIFeatures, labels, trials2remove, recordingFolder);
 else
-    [trainedClassifier, validationAccuracy]...
+    [~, validationAccuracy]...
         = Proccessing.LearnModel(MIAccumilate, accumilateLabels, removeAccumilate, recordingFolder);
 end
 
