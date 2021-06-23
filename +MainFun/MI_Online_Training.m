@@ -119,28 +119,30 @@ assert(nClass == length(model.ClassNames), ...
     'number of chosen classes and number of model classes are uneven!');
 
 %% Record Resteing State Stage
-% Display rest message
-text(0.5,0.5 ,...
-    ['Just rest for now.' sprintf('\n') 'The training session will begin soon.'], ...
-    'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
-
-% Letting the signal time to stabalize
-pause(10)
-% Pause for the resting state time
-pause(restingTime)
-
-% Extract resting state signal and preprocess it
-RestingSignal       = restingStateDelay.OutputPort(1).Data';
-[RestingMI, ~]      = Proccessing.Preprocess(RestingSignal);
-restingStateBands   = EEGFun.restingState(RestingMI, bands, Hz);
-
-% Clear axis
-cla
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% % % % Display rest message
+% % % text(0.5,0.5 ,...
+% % %     ['Just rest for now.' sprintf('\n') 'The training session will begin soon.'], ...
+% % %     'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
+% % % 
+% % % % Letting the signal time to stabalize
+% % % pause(10)
+% % % % Pause for the resting state time
+% % % pause(restingTime)
+% % % 
+% % % % Extract resting state signal and preprocess it
+% % % RestingSignal       = restingStateDelay.OutputPort(1).Data';
+% % % [RestingMI, ~]      = Proccessing.Preprocess(RestingSignal);
+% % % restingStateBands   = EEGFun.restingState(RestingMI, bands, Hz);
+% % % 
+% % % % Clear axis
+% % % cla
 % Show a message that declares that training is about to begin
 text(0.5,0.5 ,...
-    'The Communication Program will begin in few seconds.', ...
+    ['System calibrating.' sprintf('\n') 'The Training Program will begin shortly.'], ...
     'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
-pause(3)
+pause(10)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Clear axis
 cla
 %% Record Training Stage
@@ -182,7 +184,19 @@ for trial = 1 : numTrials * nClass % Number of trials times number of classes
     success = ones(1, 4);  %initiallize counter
 
     while max(success) < 4
-
+        
+        %%% INSERT STOP SIGN %%%
+        
+        % Pause for the resting state time
+        pause(restingTime)
+        
+        %%% INSERT GO SIGN %%%
+        
+        % Extract resting state signal and preprocess it
+        RestingSignal       = restingStateDelay.OutputPort(1).Data';
+        [RestingMI, ~]      = Proccessing.Preprocess(RestingSignal);
+        restingStateBands   = EEGFun.restingState(RestingMI, bands, Hz);
+        
         % Clear axis
         cla
         % Draw current images

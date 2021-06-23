@@ -106,29 +106,31 @@ hAx.YLim = [0, 1];
 hold on
 
 %% Record Resteing State Stage
-% Display rest message
-text(0.5,0.5 ,...
-    ['Just rest for now.' sprintf('\n') 'The training session will begin soon.'], ...
-    'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
-
-% Letting the signal time to stabalize
-pause(10)
-% Pause for the resting state time
-pause(restingTime)
-
-% Extract resting state signal and preprocess it
-RestingSignal       = restingStateDelay.OutputPort(1).Data';
-[RestingMI, ~]      = Proccessing.Preprocess(RestingSignal);
-restingStateBands   = EEGFun.restingState(RestingMI, bands, Hz);
-
-% Clear axis
-cla
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% % % % Display rest message
+% % % text(0.5,0.5 ,...
+% % %     ['Just rest for now.' sprintf('\n') 'The training session will begin soon.'], ...
+% % %     'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
+% % % 
+% % % % Letting the signal time to stabalize
+% % % pause(10)
+% % % % Pause for the resting state time
+% % % pause(restingTime)
+% % % 
+% % % % Extract resting state signal and preprocess it
+% % % RestingSignal       = restingStateDelay.OutputPort(1).Data';
+% % % [RestingMI, ~]      = Proccessing.Preprocess(RestingSignal);
+% % % restingStateBands   = EEGFun.restingState(RestingMI, bands, Hz);
+% % % 
+% % % % Clear axis
+% % % cla
 
 % Show a message that declares that training is about to begin
 text(0.5,0.5 ,...
-    'The training session will begin in few seconds.', ...
+    ['System calibrating.' sprintf('\n') 'The training session will begin shortly.'], ...
     'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
-pause(3)
+pause(10)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Clear axis
 cla
 
@@ -151,7 +153,10 @@ for trial_i = 1:numTrials * numClass
     % Clear axis
     cla
     
-    
+    % Extract resting state signal and preprocess it
+    RestingSignal       = restingStateDelay.OutputPort(1).Data';
+    [RestingMI, ~]      = Proccessing.Preprocess(RestingSignal);
+    restingStateBands   = EEGFun.restingState(RestingMI, bands, Hz);
     
     % Ready
     text(0.5,0.5 , 'Ready',...

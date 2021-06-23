@@ -90,28 +90,28 @@ set(MainFig,'NumberTitle','off');
 % Set background color
 set(hAx,'color', 'black');
 
-% Display rest message
-hText = text(0.5,0.5 ,...
-    ['Just rest for now.' sprintf('\n') 'The Communication Program will begin soon.'], ...
-    'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
+% % % % Display rest message
+% % % hText = text(0.5,0.5 ,...
+% % %     ['Just rest for now.' sprintf('\n') 'The Communication Program will begin soon.'], ...
+% % %     'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
 
 %% Record Resteing State Stage
-
-pause(10)                   % Letting the signal time to stabalize
-pause(restingTime)          % Pause for the resting state time
-
-% Extract resting state signal and preprocess it
-RestingSignal       = restingStateDelay.OutputPort(1).Data';
-[RestingMI, ~]      = Proccessing.Preprocess(RestingSignal);
-restingStateBands   = EEGFun.restingState(RestingMI, bands, Hz);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% % % pause(10)                   % Letting the signal time to stabalize
+% % % pause(restingTime)          % Pause for the resting state time
+% % % 
+% % % % Extract resting state signal and preprocess it
+% % % RestingSignal       = restingStateDelay.OutputPort(1).Data';
+% % % [RestingMI, ~]      = Proccessing.Preprocess(RestingSignal);
+% % % restingStateBands   = EEGFun.restingState(RestingMI, bands, Hz);
 
 % Show a message that declares that training is about to begin
-delete(hText)
+% % % delete(hText)
 hText = text(0.5,0.5 ,...
-    'The Communication Program will begin in few seconds.', ...
+    ['System calibrating.' sprintf('\n') 'The Communication Program will begin shortly.'], ...
     'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
-pause(3)
-
+pause(10)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% First State Of KeyBoard GUI
 % Initiall state for main menu
@@ -143,6 +143,18 @@ while runFlag == 1 % Number of trials times number of classes
         certainty = 0.6;
     end
     
+    %%% INSERT STOP SIGN %%%
+    
+    % Pause for the resting state time
+    pause(restingTime)          
+    
+    %%% INSERT GO SIGN %%%
+    
+    % Extract resting state signal and preprocess it
+    RestingSignal       = restingStateDelay.OutputPort(1).Data';
+    [RestingMI, ~]      = Proccessing.Preprocess(RestingSignal);
+    restingStateBands   = EEGFun.restingState(RestingMI, bands, Hz);
+
     % Accumulate chunk
     pause(trialLength + 0.5)
     
