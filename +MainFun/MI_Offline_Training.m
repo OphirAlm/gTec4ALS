@@ -24,7 +24,7 @@ bands{10} = [35, 40];
 
 %% Run stimulation and record EEG data
 [recordingFolder, ~, EEG, trainingVec, restingStateBands, Hz, ~] = ...
-    Proccessing.OfflineTraining;
+    Proccessing.OfflineTraining(bands);
 
 % End of Phase message
 disp('Finished Training.');

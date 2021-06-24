@@ -13,6 +13,7 @@ AMPobj          = [USBobj '/g.USBamp UB-2016.03.01'];
 IMPobj          = [USBobj '/Impedance Check'];
 RestDelayobj    = [USBobj '/Resting Delay'];
 ChunkDelayobj   = [USBobj '/Chunk Delay'];
+scopeObj        = [USBobj '/g.SCOPE'];
 
 % Open Simulink
 open_system(['Utillity/' USBobj])
@@ -24,6 +25,7 @@ set_param(USBobj,'BlockReduction', 'off')
 
 % Start simulation
 Utillity.startSimulation(inf, USBobj);
+open_system(scopeObj);
 
 % Get the running time object (Delay line)
 restingStateDelay  = get_param(RestDelayobj,'RuntimeObject');
@@ -114,37 +116,20 @@ elseif accumulationFlag
 end
 
 % Load features' parameters
-load(strcat(fullPath,'\FeatureParam.mat'), 'bands','f')
+load(strcat(fullPath,'\FeatureParam.mat'), 'bands')
+nbBands = size(bands, 2);
 
 % Sanity check - number of classes
 assert(nClass == length(model.ClassNames), ...
     'number of chosen classes and number of model classes are uneven!');
 
-%% Record Resteing State Stage
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % % % Display rest message
-% % % text(0.5,0.5 ,...
-% % %     ['Just rest for now.' sprintf('\n') 'The training session will begin soon.'], ...
-% % %     'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
-% % % 
-% % % % Letting the signal time to stabalize
-% % % pause(10)
-% % % % Pause for the resting state time
-% % % pause(restingTime)
-% % % 
-% % % % Extract resting state signal and preprocess it
-% % % RestingSignal       = restingStateDelay.OutputPort(1).Data';
-% % % [RestingMI, ~]      = Proccessing.Preprocess(RestingSignal);
-% % % restingStateBands   = EEGFun.restingState(RestingMI, bands, Hz);
-% % % 
-% % % % Clear axis
-% % % cla
+%% System Stabilazation
 % Show a message that declares that training is about to begin
 text(0.5,0.5 ,...
-    ['System calibrating.' sprintf('\n') 'The Training Program will begin shortly.'], ...
+    ['System is calibrating.' sprintf('\n') 'The Training Program will begin shortly.'], ...
     'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
-pause(10)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+pause(15)
+
 % Clear axis
 cla
 %% Record Training Stage
@@ -153,12 +138,13 @@ trainingVec = Utillity.prepareTraining(numTrials,Classes);
 
 % Allocate arraies
 EEG             = zeros(nbChan, trialLength * Hz, numTrials * nClass * 3);
+restingStateBands     = zeros(7, nbBands, numTrials * nClass * 3);
 labels          = zeros(1, numTrials * nClass * 3);
 trials2remove   = zeros(size(labels));
 correctLabeled  = zeros(size(labels));
 
 % For each trial:
-for trial = 1 : numTrials * nClass % Number of trials times number of classes
+for trial = 1 : (numTrials * nClass) % Number of trials times number of classes
 
     currentTrial = trainingVec(trial);
 
@@ -179,28 +165,15 @@ for trial = 1 : numTrials * nClass % Number of trials times number of classes
         'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
     % Pause for ready length
     pause(readyLength);
-    % Clear axis
-    cla
-
+    
     %% Present the cue untill 3 succesfull classifications
     success = ones(1, 4);  %initiallize counter
 
     while max(success) < 4
         
-        %%% INSERT STOP SIGN %%%
-        
-        % Pause for the resting state time
-        pause(restingTime)
-        
-        %%% INSERT GO SIGN %%%
-        
-        % Extract resting state signal and preprocess it
-        RestingSignal       = restingStateDelay.OutputPort(1).Data';
-        [RestingMI, ~]      = Proccessing.Preprocess(RestingSignal);
-        restingStateBands   = EEGFun.restingState(RestingMI, bands, Hz);
-        
         % Clear axis
         cla
+        
         % Draw current images
         image(Idle{success(1)}, 'XData', [0.37 .63], 'YData', [0.92 0.55]);
         image(Arrow{success(2)}, 'XData', [0.67 .99], 'YData', [0.92 0.55]);
@@ -208,9 +181,17 @@ for trial = 1 : numTrials * nClass % Number of trials times number of classes
         image(rot90(Arrow{success(4)}, 1), 'XData', [0.38 .62], 'YData', [0.04 0.5]);
         rectangle('Position',rectangePos(currentTrial, :),'Curvature',0.2,...
             'EdgeColor', 'm', 'LineWidth', 7)
+        
+        % Display stop and go signs
+        Utillity.stopGo(restingTime);
+        
+        % Extract resting state signal and preprocess it
+        RestingSignal       = restingStateDelay.OutputPort(1).Data';
+        [RestingMI, ~]      = Proccessing.Preprocess(RestingSignal);
+        restingStateBands(:, :, chunk_i)   = EEGFun.restingState(RestingMI, bands, Hz);
+        
         % Pause for trial length
         pause(trialLength);
-
 
         % Get signal chunk
         EEG(:, :, chunk_i) = rto.OutputPort(1).Data';
@@ -221,7 +202,7 @@ for trial = 1 : numTrials * nClass % Number of trials times number of classes
         trials2remove(chunk_i) = removeTrial; %Flag is trial is noisy
 
         % Extract features
-        MIFeatures(chunk_i, :) = Proccessing.ExtractFeatures(MIData, Hz, bands, restingStateBands);
+        MIFeatures(chunk_i, :) = Proccessing.ExtractFeatures(MIData, Hz, bands, restingStateBands(:, :, chunk_i));
 
         % Predict using the pre-trained model
         [prediction, scores] = predict(model, MIFeatures(chunk_i, :));
@@ -264,17 +245,25 @@ for trial = 1 : numTrials * nClass % Number of trials times number of classes
     % Clear axis
     cla
 
-    % Display "Next" trial text
-    text(0.5,0.5 , 'Next',...
-        'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
-    % Display trial count
-    text(0.5,0.2 , strcat('Trial #',num2str(trial + 1),' Out Of : '...
-        ,num2str(numTrials * nClass)),...
-        'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
-    % Wait for next trial
-    pause(nextLength);
-    % Clear axis
-    cla
+    % After the final trial
+    if trial == (numTrials * nClass)
+        % Display model training messsage on screen
+        text(0.5,0.5 , 'Training new model, please wait.',...
+            'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
+        pause(0.000000000000000001)
+    else
+        % Otherwise, display "Next" trial text
+        text(0.5,0.5 , 'Next',...
+            'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
+        % Display trial count
+        text(0.5,0.2 , strcat('Trial #',num2str(trial + 1),' Out Of : '...
+            ,num2str(numTrials * nClass)),...
+            'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
+        % Wait for next trial
+        pause(nextLength);
+        % Clear axis
+        cla
+    end
 end
 
 %% Delete spare space in arraies
@@ -288,6 +277,7 @@ correctLabeled(chunk_i:end)    = [];
 
 %Stop simulink
 set_param(gcs, 'SimulationCommand', 'stop')
+bdclose all
 
 %% Train new model
 disp('Training new model, please wait')
@@ -328,7 +318,7 @@ trainingVec = labels; %Rename for comfort
 save([recordingFolder, 'trainingVec'], 'trainingVec')
 save([recordingFolder, 'trials2remove'], 'trials2remove')
 save([recordingFolder, 'FeatureParam'], 'bands')
-save([recordingFolder, 'RestingSignal'], 'RestingSignal')
+save([recordingFolder, 'restingStateBands'], 'restingStateBands')
 save([recordingFolder, 'correctLabeled'], 'correctLabeled')
 save([recordingFolder, 'removeAccumilate'], 'removeAccumilate')
 save([recordingFolder, 'MIAccumilate'], 'MIAccumilate')
@@ -336,11 +326,6 @@ save([recordingFolder, 'accumilateLabels'], 'accumilateLabels')
 
 
 %% Train model
-
-% Display messsage on screen
-cla
-text(0.5,0.5 , 'Training new model, please wait.',...
-    'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
 
 if ~accumulationFlag
     %Train new model
@@ -362,7 +347,7 @@ disp([num2str(correct_trials) ' out of ' num2str(numTrials * nClass) '(' ...
 % Display accuracy messsage on screen
 cla
 text(0.5,0.5 , [ 'New Model Accuracy - ' num2str(validationAccuracy*100),'%'...
-    sprintf('\n') 'Current Session (Previous Model) Preformance - ' ...
+    sprintf('\n') 'Current Session (Previous Model) Performance - ' ...
     num2str(correct_trials) ' Out Of ' num2str(numTrials * nClass)...
     '('  num2str(100 * correct_trials /(numTrials * nClass)) '%)'],...
     'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);

@@ -1,6 +1,6 @@
 %% Offline MI Training
 function [recordingFolder,subID, EEG, trainingVec, restingStateBands, ...
-    Hz, trialLength] = OfflineTraining
+    Hz, trialLength] = OfflineTraining(bands)
 % OFFLINETRAINING Runs an offline training session.
 % Uses parameters from parameter file and parameter selection gui.
 %
@@ -26,6 +26,7 @@ AMPobj          = [USBobj '/g.USBamp UB-2016.03.01'];
 IMPobj          = [USBobj '/Impedance Check'];
 RestDelayobj    = [USBobj '/Resting Delay'];
 ChunkDelayobj   = [USBobj '/Chunk Delay'];
+scopeObj        = [USBobj '/g.SCOPE'];
 
 % open Simulink
 open_system(['Utillity/' USBobj])
@@ -37,6 +38,7 @@ set_param(USBobj,'BlockReduction', 'off')
 
 %Start simulation
 Utillity.startSimulation(inf, USBobj);
+open_system(scopeObj);
 
 %Get the running time object (buffer)
 rto = get_param(ChunkDelayobj,'RuntimeObject');
@@ -61,16 +63,18 @@ trainingImage{4} = imread('./LoadingPics/downArrow.jpg');            % (4) load 
 
 % number of channels
 nbChan = 16;        
+% Number of bands
+nbBands = size(bands, 2);
 % Cue length in seconds
 cueLength = 2;
 % Ready length in seconds
-readyLength = 1;         
+readyLength = restingTime;         
 % Time between trials in seconds
 nextLength = 1;
 
 % Allocate Signal matrices
 EEG = zeros(nbChan, trialLength*Hz, numClass*numTrials);  
-restingStateBands = zeros(nbChan, restingTime*Hz, numClass*numTrials);
+restingStateBands = zeros(7, nbBands, numClass*numTrials);
 %% Display Setup
 % Checking monitor position and number of monitors
 monitorPos = get(0,'MonitorPositions');
@@ -106,31 +110,13 @@ hAx.YLim = [0, 1];
 hold on
 
 %% Record Resteing State Stage
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % % % Display rest message
-% % % text(0.5,0.5 ,...
-% % %     ['Just rest for now.' sprintf('\n') 'The training session will begin soon.'], ...
-% % %     'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
-% % % 
-% % % % Letting the signal time to stabalize
-% % % pause(10)
-% % % % Pause for the resting state time
-% % % pause(restingTime)
-% % % 
-% % % % Extract resting state signal and preprocess it
-% % % RestingSignal       = restingStateDelay.OutputPort(1).Data';
-% % % [RestingMI, ~]      = Proccessing.Preprocess(RestingSignal);
-% % % restingStateBands   = EEGFun.restingState(RestingMI, bands, Hz);
-% % % 
-% % % % Clear axis
-% % % cla
 
 % Show a message that declares that training is about to begin
 text(0.5,0.5 ,...
-    ['System calibrating.' sprintf('\n') 'The training session will begin shortly.'], ...
+    ['System is calibrating.' sprintf('\n') 'The training session will begin shortly.'], ...
     'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
-pause(10)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+pause(15)
+
 % Clear axis
 cla
 
@@ -153,11 +139,6 @@ for trial_i = 1:numTrials * numClass
     % Clear axis
     cla
     
-    % Extract resting state signal and preprocess it
-    RestingSignal                  = restingStateDelay.OutputPort(1).Data';
-    [RestingMI, ~]                 = Proccessing.Preprocess(RestingSignal);
-    restingStateBands(:,:,trial_i) = EEGFun.restingState(RestingMI, bands, Hz);
-    
     % Ready
     text(0.5,0.5 , 'Ready',...
         'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
@@ -165,6 +146,11 @@ for trial_i = 1:numTrials * numClass
     pause(readyLength);
     % Clear axis
     cla
+    
+        % Extract resting state signal and preprocess it
+    RestingSignal                  = restingStateDelay.OutputPort(1).Data';
+    [RestingMI, ~]                 = Proccessing.Preprocess(RestingSignal);
+    restingStateBands(:,:,trial_i) = EEGFun.restingState(RestingMI, bands, Hz);
     
     
     % Show image of the corresponding label of the trial
@@ -183,7 +169,7 @@ for trial_i = 1:numTrials * numClass
         'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
     % Display trial count
     text(0.5,0.2 , strcat('Trial #',num2str(trial_i + 1),' Out Of : '...
-        ,num2str(numTrials * nClass)),...
+        ,num2str(numTrials * numClass)),...
         'HorizontalAlignment', 'Center', 'Color', 'white', 'FontSize', 40);
     % Wait for next trial
     pause(nextLength);
@@ -200,6 +186,7 @@ save([recordingFolder, 'parameters'], 'Hz', 'trialLength')
 
 % Stop simulink
 set_param(gcs, 'SimulationCommand', 'stop')
+bdclose all
 
 % Close figure
 close(MainFig)
