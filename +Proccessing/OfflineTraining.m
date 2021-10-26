@@ -109,7 +109,7 @@ hAx.XLim = [0, 1];
 hAx.YLim = [0, 1];
 hold on
 
-%% Record Resteing State Stage
+%% Record Resting State Stage
 
 % Show a message that declares that training is about to begin
 text(0.5,0.5 ,...
@@ -147,7 +147,7 @@ for trial_i = 1:numTrials * numClass
     % Clear axis
     cla
     
-        % Extract resting state signal and preprocess it
+    % Extract resting state signal and preprocess it
     RestingSignal                  = restingStateDelay.OutputPort(1).Data';
     [RestingMI, ~]                 = Proccessing.Preprocess(RestingSignal);
     restingStateBands(:,:,trial_i) = EEGFun.restingState(RestingMI, bands, Hz);
@@ -156,7 +156,8 @@ for trial_i = 1:numTrials * numClass
     % Show image of the corresponding label of the trial
     image(flip(trainingImage{currentTrial}, 1), 'XData', [0.25, 0.75],...
         'YData', [0.25, 0.75 * ...
-        size(trainingImage{currentTrial},1)./ size(trainingImage{currentTrial},2)])    % Pause for trial length
+        size(trainingImage{currentTrial},1)./ size(trainingImage{currentTrial},2)])    
+    % Pause for trial length
     pause(trialLength)
     % Clear axis
     cla

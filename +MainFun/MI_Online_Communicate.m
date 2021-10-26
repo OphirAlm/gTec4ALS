@@ -7,9 +7,9 @@ function MI_Online_Communicate()
 %   sides - right goes down, left goes up).
 %
 %   Class movements:
-%         - Right MI - Right movement.
+%        - Right MI - Right movement.
 %        - Left MI - Left movements.
-%         - Leg MI - Decision.
+%        - Leg MI - Decision.
 %        - Idle - Stay put.
 %
 %% Set params and setup psychtoolbox & Simulink
@@ -41,10 +41,6 @@ fullPath = uigetdir(['C:/Subjects/Sub' num2str(subID) '/'], ...
     'Choose Desired Directory');
 
 %% Load photos
-
-% % % Set classes' numbers vector
-% % % Classes = 1 : nClass;
-
 % Define the keyboard keys that are listened for:
 KbName('UnifyKeyNames');
 % let psychtoolbox know what the escape key is
